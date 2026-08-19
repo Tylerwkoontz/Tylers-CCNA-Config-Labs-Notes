@@ -1,0 +1,30 @@
+# MkDocs generated build directory
+site/
+
+# Python Virtual Environments
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Python cache & bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Editor & OS artifacts
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Environment variables & local secrets
+.env
+*.local
