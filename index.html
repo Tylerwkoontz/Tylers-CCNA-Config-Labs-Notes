@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tyler's CCNA Study & Lab Hub</title>
+    <style>
+        :root {
+            --bg-body: #0b0f19;
+            --bg-card: #151e2e;
+            --bg-inner: #0f172a;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-blue: #0284c7;
+            --accent-cyan: #38bdf8;
+            --accent-green: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-purple: #8b5cf6;
+            --border-color: #223049;
+            --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        }
+
+        body {
+            margin: 0;
+            padding: 32px 20px;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: var(--font);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1040px;
+            margin: 0 auto;
+        }
+
+        /* Hero / Header */
+        .hero {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 28px 32px;
+            margin-bottom: 28px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .hero h1 {
+            margin: 0 0 6px 0;
+            font-size: 2rem;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+        }
+
+        .hero p {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        .hero-badge {
+            background: #0369a1;
+            color: #e0f2fe;
+            padding: 6px 14px;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Section Headings */
+        h2 {
+            font-size: 1.35rem;
+            color: var(--accent-cyan);
+            margin: 32px 0 16px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Grid Layouts */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+        }
+
+        /* Cards */
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 8px 20px -4px rgba(2, 132, 199, 0.15);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .card-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin: 0;
+        }
+
+        .card-desc {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin: 0 0 16px 0;
+        }
+
+        .tag {
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+        }
+
+        .tag-cml { background: #581c87; color: #f3e8ff; }
+        .tag-active { background: #064e3b; color: #a7f3d0; }
+        .tag-notes { background: #1e3a8a; color: #bfdbfe; }
+
+        /* Buttons & Links */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 9px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-blue);
+            color: #ffffff;
+        }
+        .btn-primary:hover { background-color: #0270a3; }
+
+        .btn-secondary {
+            background-color: #334155;
+            color: #f8fafc;
+        }
+        .btn-secondary:hover { background-color: #475569; }
+
+        .btn-green {
+            background-color: #059669;
+            color: #ffffff;
+        }
+        .btn-green:hover { background-color: #047857; }
+
+        /* Workflow Steps */
+        .workflow-step {
+            background: var(--bg-inner);
+            border-left: 4px solid var(--accent-blue);
+            border-radius: 6px;
+            padding: 14px 18px;
+            margin-bottom: 12px;
+        }
+
+        .step-num {
+            font-weight: 800;
+            color: var(--accent-cyan);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+
+        .step-title {
+            font-weight: 700;
+            color: #ffffff;
+            font-size: 1rem;
+            margin: 2px 0 6px 0;
+        }
+
+        .step-prompt {
+            background: #070a12;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            color: #38bdf8;
+            margin-top: 6px;
+            border: 1px solid #1e293b;
+        }
+
+        /* Subnetting Trainer Tool */
+        .trainer-box {
+            background: var(--bg-inner);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 14px;
+        }
+
+        .trainer-target {
+            font-family: var(--font-mono);
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--accent-amber);
+            margin: 10px 0;
+        }
+
+        .trainer-input-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 12px 0;
+        }
+
+        .trainer-input {
+            background: #070a12;
+            border: 1px solid #334155;
+            color: #ffffff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .trainer-result {
+            margin-top: 10px;
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        /* Terminal block */
+        pre {
+            background: #070a12;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 14px;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: #e2e8f0;
+            overflow-x: auto;
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Hero Header -->
+    <div class="hero">
+        <div>
+            <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
+                <span class="hero-badge">Local-First Hub</span>
+                <span class="hero-badge" style="background: #064e3b; color: #a7f3d0;">Private & Offline</span>
+            </div>
+            <h1>Tyler's CCNA Study & Lab Hub</h1>
+            <p>Direct access to interactive lab workbooks, Wendell Odom chapter notes, and CML lab automation.</p>
+        </div>
+        <div>
+            <a href="labs/lab09-multi-subnet-routing.html" class="btn btn-primary" style="font-size: 1rem; padding: 12px 20px;">
+                🚀 Open Active Lab 09
+            </a>
+        </div>
+    </div>
+
+    <!-- Active Study Focus -->
+    <h2>🎯 Active Chapter Focus</h2>
+    <div class="card" style="border-left: 5px solid #10b981; background: linear-gradient(to right, #13232c, #151e2e);">
+        <div class="card-header">
+            <div>
+                <h3 class="card-title" style="font-size: 1.3rem;">Volume 1, Chapter 9: Subnet Design & IPv4 Routing</h3>
+                <p class="card-desc" style="margin-top: 4px;">
+                    Mastering VLSM formulas, the Magic Number method ($256 - \text{mask}$), Cisco IOS interface configuration, and static routing logic.
+                </p>
+            </div>
+            <span class="tag tag-active">In Progress</span>
+        </div>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <a href="labs/lab09-multi-subnet-routing.html" class="btn btn-primary">
+                📄 Open Lab 09 Workbook
+            </a>
+            <a href="notes/ch09-subnetting-and-routing.md" class="btn btn-secondary">
+                📝 View Chapter 9 Notes
+            </a>
+            <a href="notes/subnetting-speed-drills.md" class="btn btn-secondary">
+                ⚡ Subnetting Speed Drills
+            </a>
+        </div>
+    </div>
+
+    <!-- Lab Catalog -->
+    <h2>🧪 Interactive Lab Workbooks</h2>
+    <div class="grid-2">
+        <!-- Lab 09 Card -->
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <h3 class="card-title">Lab 09: Multi-Subnet IPv4 Routing</h3>
+                    <p style="font-size: 0.8rem; color: #38bdf8; margin: 2px 0;">CCNA 1.6 & 3.1 • Est. 35 Mins</p>
+                </div>
+                <span class="tag tag-cml">CML Ready</span>
+            </div>
+            <p class="card-desc">
+                Design VLSM subnets from <code>192.168.100.0/24</code> for Sales LAN, Eng LAN, and Point-to-Point WAN. Configure Cisco IOSv routers and verify end-to-end routing.
+            </p>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <a href="labs/lab09-multi-subnet-routing.html" class="btn btn-primary">
+                    Open Lab Workbook
+                </a>
+                <button class="btn btn-secondary" onclick="copySnippet('python3 ~/ccna-study/scripts/cml_client.py start 86e5272c-f7a7-40b3-84ab-47ff9f969786')">
+                    📋 Copy CML Start CLI
+                </button>
+            </div>
+        </div>
+
+        <!-- Quick CML Control Card -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">⚡ CML Controller CLI</h3>
+                <span class="tag tag-cml">cml-controller.internal</span>
+            </div>
+            <p class="card-desc">
+                Run these commands in your workstation terminal to manage topologies on Proxmox:
+            </p>
+            <pre><code># 1. List all labs
+python3 ~/ccna-study/scripts/cml_client.py list
+
+# 2. Start Lab 09
+python3 ~/ccna-study/scripts/cml_client.py start 86e5272c-f7a7-40b3-84ab-47ff9f969786
+
+# 3. Stop Lab 09
+python3 ~/ccna-study/scripts/cml_client.py stop 86e5272c-f7a7-40b3-84ab-47ff9f969786</code></pre>
+        </div>
+    </div>
+
+    <!-- Daily Study & Lab Workflow -->
+    <h2>🔄 Daily Study & Lab Workflow</h2>
+    <div class="card">
+        <div class="workflow-step">
+            <div class="step-num">Step 1 • Diagnostic Warmup (5 Mins)</div>
+            <div class="step-title">Run a pre-chapter DIKTA assessment with Antigravity</div>
+            <div class="step-prompt">"I'm ready for Chapter 9. Run a 4-question DIKTA diagnostic quiz on subnet design."</div>
+        </div>
+
+        <div class="workflow-step">
+            <div class="step-num">Step 2 • Active Reading (30 Mins)</div>
+            <div class="step-title">Read Odom Cert Guide & ask for first-principles explanations</div>
+            <div class="step-prompt">"Explain how the magic number works when calculating a /21 subnet mask."</div>
+        </div>
+
+        <div class="workflow-step">
+            <div class="step-num">Step 3 • Hands-On Lab in CML (35 Mins)</div>
+            <div class="step-title">Open the interactive lab guide and configure on CML</div>
+            <div class="step-prompt">Open: ~/ccna-study/labs/lab09-multi-subnet-routing.html</div>
+        </div>
+
+        <div class="workflow-step">
+            <div class="step-num">Step 4 • Break-Fix Drill (15 Mins)</div>
+            <div class="step-title">Let the assistant inject a mystery fault for you to troubleshoot</div>
+            <div class="step-prompt">"Break something in my CML Lab 9 topology and give me only the symptom."</div>
+        </div>
+
+        <div class="workflow-step">
+            <div class="step-num">Step 5 • Record Insights (2 Mins)</div>
+            <div class="step-title">Save lessons learned directly into your local notes</div>
+            <div class="step-prompt">"Add a lesson learned about OSPF passive-interface command to my notes."</div>
+        </div>
+    </div>
+
+    <!-- Interactive Subnetting Trainer Mini-App -->
+    <h2>🧠 Mental Subnetting Speed Trainer</h2>
+    <div class="card">
+        <p class="card-desc">Practice calculating the Subnet ID, Usable Host Range, and Broadcast Address in your head:</p>
+        <div class="trainer-box">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-weight: 700; color: #94a3b8; font-size: 0.85rem; text-transform: uppercase;">Current Challenge IP & Prefix:</span>
+                <button class="btn btn-secondary" onclick="generateSubnetChallenge()">🎲 New Challenge</button>
+            </div>
+            <div class="trainer-target" id="challenge-ip">172.16.45.14 /21</div>
+
+            <div class="trainer-input-row">
+                <input type="text" id="ans-subnet" class="trainer-input" placeholder="Subnet ID (e.g. 172.16.40.0)">
+                <input type="text" id="ans-broadcast" class="trainer-input" placeholder="Broadcast (e.g. 172.16.47.255)">
+                <button class="btn btn-green" onclick="checkSubnetAnswer()">Check Answer</button>
+            </div>
+            <div class="trainer-result" id="trainer-feedback"></div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function copySnippet(text) {
+        navigator.clipboard.writeText(text).then(() => {
+            alert('Copied CML command to clipboard: ' + text);
+        });
+    }
+
+    // Interactive Subnet Generator Data
+    const challenges = [
+        { ip: '172.16.45.14 /21', subnet: '172.16.40.0', broadcast: '172.16.47.255', magic: 8 },
+        { ip: '192.168.1.142 /27', subnet: '192.168.1.128', broadcast: '192.168.1.159', magic: 32 },
+        { ip: '10.50.20.100 /20', subnet: '10.50.16.0', broadcast: '10.50.31.255', magic: 16 },
+        { ip: '10.100.5.50 /29', subnet: '10.100.5.48', broadcast: '10.100.5.55', magic: 8 },
+        { ip: '192.168.100.75 /26', subnet: '192.168.100.64', broadcast: '192.168.100.127', magic: 64 },
+        { ip: '172.20.99.45 /19', subnet: '172.20.96.0', broadcast: '172.20.127.255', magic: 32 }
+    ];
+
+    let currentChallenge = challenges[0];
+
+    function generateSubnetChallenge() {
+        const idx = Math.floor(Math.random() * challenges.length);
+        currentChallenge = challenges[idx];
+        document.getElementById('challenge-ip').innerText = currentChallenge.ip;
+        document.getElementById('ans-subnet').value = '';
+        document.getElementById('ans-broadcast').value = '';
+        document.getElementById('trainer-feedback').innerText = '';
+    }
+
+    function checkSubnetAnswer() {
+        const sub = document.getElementById('ans-subnet').value.trim();
+        const bcast = document.getElementById('ans-broadcast').value.trim();
+        const feedback = document.getElementById('trainer-feedback');
+
+        if (sub === currentChallenge.subnet && bcast === currentChallenge.broadcast) {
+            feedback.innerHTML = `<span style="color: #10b981;">🎉 Correct! Magic number is ${currentChallenge.magic}. Subnet ID: ${currentChallenge.subnet}, Broadcast: ${currentChallenge.broadcast}</span>`;
+        } else {
+            feedback.innerHTML = `<span style="color: #f59e0b;">❌ Not quite. Expected Subnet: <code>${currentChallenge.subnet}</code> | Broadcast: <code>${currentChallenge.broadcast}</code> (Magic Number: ${currentChallenge.magic})</span>`;
+        }
+    }
+</script>
+
+</body>
+</html>
