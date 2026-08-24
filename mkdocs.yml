@@ -1,5 +1,5 @@
 site_name: "Tyler's CCNA Lab Hub & Study Notes (Internal)"
-site_description: Private CCNA study notes, Wendell Odom Cert Guide breakdowns, and CML lab scenarios.
+site_description: Private CCNA study notes, Wendell Odom Cert Guide breakdowns, and interactive CML lab workbooks.
 site_author: Tyler Koontz
 
 theme:
@@ -30,6 +30,9 @@ theme:
     - search.suggest
     - search.highlight
     - content.code.copy
+
+extra_css:
+  - stylesheets/lab-styles.css
 
 markdown_extensions:
   - admonition
@@ -66,8 +69,11 @@ nav:
       - Overview: 01-cert-guide-notes/index.md
       - Chapter 09 - Subnetting & IPv4 Routing: 01-cert-guide-notes/ch09-subnetting-and-routing.md
   - 02. CML Labs:
-      - Overview: 02-cml-labs/index.md
-      - Lab 09 - Multi-Subnet Routing Lab: 02-cml-labs/lab09-multi-subnet-routing.md
+      - Lab Catalog & Dashboard: 02-cml-labs/index.md
+      - Published Workbooks:
+          - Lab 09 - Multi-Subnet IPv4 Routing: 02-cml-labs/published/lab09-multi-subnet-routing.md
+          - Master Lab Template: 02-cml-labs/published/template-lab-guide.md
+      - Lab Drafts & Scratchpad: 02-cml-labs/drafts/index.md
   - 03. Troubleshooting Drills:
       - Overview: 03-troubleshooting-drills/index.md
   - 04. Quizzes & Drills:
