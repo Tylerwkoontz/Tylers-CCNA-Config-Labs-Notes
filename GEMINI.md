@@ -1,18 +1,22 @@
-# Tyler's CCNA Study & Lab Hub (Local-First Architecture)
+# Tyler's CCNA Study & Lab Hub (Pure HTML Architecture)
 
 ## Student Profile & Roadmap
 - **Target Exam**: Cisco CCNA (200-301 v1.1)
 - **Primary Literature**: Wendell Odom's Cisco Press Official Cert Guides (Volume 1 & Volume 2)
 - **Active Focus**: **Volume 1, Chapter 9: Subnet Design & IPv4 Routing Configuration**
 - **Lab Infrastructure**: Cisco Modeling Labs (CML 2.10) on Proxmox VE (`cml-controller.internal`)
-- **Dashboard**: `~/ccna-study/index.html` (Local-First, standalone HTML)
-- **Lab Workbooks**: `~/ccna-study/labs/*.html` (Interactive, collapsible solutions, SVG topologies)
+- **Dashboard**: `~/ccna-study/index.html` (Master Interactive Dashboard)
+- **Lab Format**: `~/ccna-study/labs/*.html` (100% Rich Standalone Interactive HTML Workbooks)
 
 ---
 
-## Daily Study Protocol
-1. **Diagnostic Warmup**: Run a 4-question pre-chapter DIKTA quiz when requested.
-2. **Concept Explanations**: Explain networking with first principles, packet walks, and binary breakdown.
-3. **CML Lab Automation**: Generate CML topologies via `cml_client.py` or MCP tools.
-4. **Interactive HTML Lab Generation**: Output new lab guides as standalone, interactive HTML workbooks in `labs/` with spoiler-free `<details>` accordions and progress trackers.
-5. **Knowledge Log**: Capture gotchas, CLI quirks, and insights in `notes/lessons-learned.md`.
+## Agent Operational Rules (Zero Fluff)
+1. **NO Markdown Fluff**: Do NOT generate separate text `.md` summary files or duplicate textbook content.
+2. **HTML-Only Lab Workbooks**: Whenever creating new chapter lab guides (e.g. Lab 10, Lab 11), generate them directly as single-file, responsive, self-contained `.html` workbooks in `labs/` with:
+   - Spoiler-free collapsible `<details>` drawers for solutions and hints.
+   - Interactive task checklists (`updateProgress()`).
+   - 1-click "Copy Config" buttons for Cisco IOS syntax.
+   - Embedded SVG network topology maps.
+   - Print-to-PDF styles (`@media print`).
+3. **CML Automation**: Manage CML topologies programmatically using `scripts/cml_client.py`.
+4. **Diagnostic & Quizzing**: Quiz the student interactively in terminal chat with Socratic questions, CLI output analysis, and packet flow tracing.

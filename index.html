@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tyler's CCNA Study & Lab Hub</title>
+    <title>Tyler's CCNA Lab Hub & Study Dashboard</title>
     <style>
         :root {
             --bg-body: #0b0f19;
@@ -35,7 +35,7 @@
             margin: 0 auto;
         }
 
-        /* Hero / Header */
+        /* Hero */
         .hero {
             background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
             border: 1px solid var(--border-color);
@@ -74,7 +74,6 @@
             letter-spacing: 0.5px;
         }
 
-        /* Section Headings */
         h2 {
             font-size: 1.35rem;
             color: var(--accent-cyan);
@@ -84,20 +83,12 @@
             gap: 8px;
         }
 
-        /* Grid Layouts */
         .grid-2 {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 20px;
         }
 
-        .grid-3 {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 16px;
-        }
-
-        /* Cards */
         .card {
             background-color: var(--bg-card);
             border: 1px solid var(--border-color);
@@ -141,9 +132,7 @@
 
         .tag-cml { background: #581c87; color: #f3e8ff; }
         .tag-active { background: #064e3b; color: #a7f3d0; }
-        .tag-notes { background: #1e3a8a; color: #bfdbfe; }
 
-        /* Buttons & Links */
         .btn {
             display: inline-flex;
             align-items: center;
@@ -159,25 +148,13 @@
             transition: all 0.2s;
         }
 
-        .btn-primary {
-            background-color: var(--accent-blue);
-            color: #ffffff;
-        }
+        .btn-primary { background-color: var(--accent-blue); color: #ffffff; }
         .btn-primary:hover { background-color: #0270a3; }
-
-        .btn-secondary {
-            background-color: #334155;
-            color: #f8fafc;
-        }
+        .btn-secondary { background-color: #334155; color: #f8fafc; }
         .btn-secondary:hover { background-color: #475569; }
-
-        .btn-green {
-            background-color: #059669;
-            color: #ffffff;
-        }
+        .btn-green { background-color: #059669; color: #ffffff; }
         .btn-green:hover { background-color: #047857; }
 
-        /* Workflow Steps */
         .workflow-step {
             background: var(--bg-inner);
             border-left: 4px solid var(--accent-blue);
@@ -253,7 +230,6 @@
             font-size: 0.95rem;
         }
 
-        /* Terminal block */
         pre {
             background: #070a12;
             border: 1px solid var(--border-color);
@@ -265,6 +241,26 @@
             overflow-x: auto;
             margin: 8px 0;
         }
+
+        /* Accordions */
+        details {
+            background: var(--bg-inner);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        details summary {
+            padding: 12px 16px;
+            font-weight: 600;
+            cursor: pointer;
+            color: #38bdf8;
+            user-select: none;
+        }
+
+        details[open] summary { border-bottom: 1px solid var(--border-color); }
+        .drawer-content { padding: 14px 16px; }
     </style>
 </head>
 <body>
@@ -275,11 +271,11 @@
     <div class="hero">
         <div>
             <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
-                <span class="hero-badge">Local-First Hub</span>
-                <span class="hero-badge" style="background: #064e3b; color: #a7f3d0;">Private & Offline</span>
+                <span class="hero-badge">Pure HTML Hub</span>
+                <span class="hero-badge" style="background: #064e3b; color: #a7f3d0;">Zero Fluff • Offline</span>
             </div>
-            <h1>Tyler's CCNA Study & Lab Hub</h1>
-            <p>Direct access to interactive lab workbooks, Wendell Odom chapter notes, and CML lab automation.</p>
+            <h1>Tyler's CCNA Lab Hub & Study Dashboard</h1>
+            <p>Direct access to interactive lab workbooks, mental speed trainers, and CML lab automation.</p>
         </div>
         <div>
             <a href="labs/lab09-multi-subnet-routing.html" class="btn btn-primary" style="font-size: 1rem; padding: 12px 20px;">
@@ -304,13 +300,19 @@
             <a href="labs/lab09-multi-subnet-routing.html" class="btn btn-primary">
                 📄 Open Lab 09 Workbook
             </a>
-            <a href="notes/ch09-subnetting-and-routing.md" class="btn btn-secondary">
-                📝 View Chapter 9 Notes
-            </a>
-            <a href="notes/subnetting-speed-drills.md" class="btn btn-secondary">
-                ⚡ Subnetting Speed Drills
-            </a>
         </div>
+
+        <details style="margin-top: 16px;">
+            <summary>📖 Quick Chapter 09 Formulas & Gotchas (Click to Expand)</summary>
+            <div class="drawer-content" style="font-size: 0.9rem;">
+                <ul>
+                    <li><strong>Number of Subnets ($s$ borrowed bits)</strong>: $2^s$</li>
+                    <li><strong>Usable Hosts per Subnet ($h$ host bits)</strong>: $2^h - 2$</li>
+                    <li><strong>Magic Number (Step Size)</strong>: $256 - \text{Interesting Octet Mask Value}$</li>
+                    <li><strong>IOS 15+ Route Types</strong>: <code>C</code> = Connected Subnet (e.g. <code>10.1.1.0/24</code>), <code>L</code> = Local Host Route for Interface IP (e.g. <code>10.1.1.1/32</code>).</li>
+                </ul>
+            </div>
+        </details>
     </div>
 
     <!-- Lab Catalog -->
@@ -345,7 +347,7 @@
                 <span class="tag tag-cml">cml-controller.internal</span>
             </div>
             <p class="card-desc">
-                Run these commands in your workstation terminal to manage topologies on Proxmox:
+                Manage your lab topologies directly on your Proxmox server from your terminal:
             </p>
             <pre><code># 1. List all labs
 python3 ~/ccna-study/scripts/cml_client.py list
@@ -384,18 +386,12 @@ python3 ~/ccna-study/scripts/cml_client.py stop 86e5272c-f7a7-40b3-84ab-47ff9f96
             <div class="step-title">Let the assistant inject a mystery fault for you to troubleshoot</div>
             <div class="step-prompt">"Break something in my CML Lab 9 topology and give me only the symptom."</div>
         </div>
-
-        <div class="workflow-step">
-            <div class="step-num">Step 5 • Record Insights (2 Mins)</div>
-            <div class="step-title">Save lessons learned directly into your local notes</div>
-            <div class="step-prompt">"Add a lesson learned about OSPF passive-interface command to my notes."</div>
-        </div>
     </div>
 
     <!-- Interactive Subnetting Trainer Mini-App -->
     <h2>🧠 Mental Subnetting Speed Trainer</h2>
     <div class="card">
-        <p class="card-desc">Practice calculating the Subnet ID, Usable Host Range, and Broadcast Address in your head:</p>
+        <p class="card-desc">Practice calculating the Subnet ID and Broadcast Address in your head:</p>
         <div class="trainer-box">
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <span style="font-weight: 700; color: #94a3b8; font-size: 0.85rem; text-transform: uppercase;">Current Challenge IP & Prefix:</span>
@@ -421,7 +417,6 @@ python3 ~/ccna-study/scripts/cml_client.py stop 86e5272c-f7a7-40b3-84ab-47ff9f96
         });
     }
 
-    // Interactive Subnet Generator Data
     const challenges = [
         { ip: '172.16.45.14 /21', subnet: '172.16.40.0', broadcast: '172.16.47.255', magic: 8 },
         { ip: '192.168.1.142 /27', subnet: '192.168.1.128', broadcast: '192.168.1.159', magic: 32 },
