@@ -1,0 +1,130 @@
+lab:
+  title: 'CCNA Lab 17: Multi-Subnet IPv4 Routing'
+  description: 'Vol 1 Ch 15 & 17: VLSM Multi-Subnet Design & Static Routing (Hierarchical
+    Layout)'
+  notes: "# CCNA Exam Lab: Multi-Subnet IPv4 Routing & VLSM Design\n**Exam Blueprint**:\
+    \ CCNA 200-301 v1.1 Domains 1.6 & 3.1\n**Focus**: Cisco Press OCG Vol 1, Chapters\
+    \ 15 & 17\n\n---\n## \U0001F3E2 Scenario & Network Topology\nYou are designing\
+    \ and implementing a Variable-Length Subnet Mask (VLSM) addressing plan derived\
+    \ from the classful network block `192.168.100.0/24`. The network consists of\
+    \ two departmental LANs (Sales and Engineering) and a point-to-point WAN link\
+    \ connecting routers `R1` and `R2`.\n\n### Subnet Capacity Requirements\n1. **Sales\
+    \ LAN** (connected to `R1 Gi0/1`): Must support at least **50 host addresses**.\
+    \ Allocate the first available subnet from `192.168.100.0/24`.\n2. **Engineering\
+    \ LAN** (connected to `R2 Gi0/1`): Must support at least **25 host addresses**.\
+    \ Allocate the next available subnet immediately following the Sales LAN block.\n\
+    3. **Point-to-Point WAN Link** (between `R1 Gi0/0` and `R2 Gi0/0`): Must support\
+    \ exactly **2 host addresses**. Allocate the next available subnet immediately\
+    \ following the Engineering LAN block.\n\n---\n## \U0001F4CB Exam Tasks & Technical\
+    \ Requirements\n1. **VLSM Design Calculations**:\n   - Calculate the Subnet ID,\
+    \ prefix length (/xx), subnet mask, first usable IP, last usable IP, and broadcast\
+    \ address for each of the three subnets.\n2. **Router Interface Addressing**:\n\
+    \   - Assign the **first usable IP address** of the Sales LAN to `R1 Gi0/1`.\n\
+    \   - Assign the **first usable IP address** of the Engineering LAN to `R2 Gi0/1`.\n\
+    \   - Assign the **first usable IP address** of the WAN link to `R1 Gi0/0` and\
+    \ the **second usable IP address** to `R2 Gi0/0`.\n   - Enable all configured\
+    \ interfaces.\n3. **Static Route Implementation**:\n   - On `R1`, configure a\
+    \ static IPv4 route to reach the Engineering LAN using `R2`'s WAN interface IP\
+    \ as the next-hop.\n   - On `R2`, configure a static IPv4 route to reach the Sales\
+    \ LAN using `R1`'s WAN interface IP as the next-hop.\n4. **End-to-End Delivery\
+    \ Verification**:\n   - Test connectivity from `PC-Sales` (`192.168.100.10`) to\
+    \ `PC-Eng` (`192.168.100.70`).\n\n---\n## \U0001F50D Success & Verification Criteria\n\
+    - All router interfaces configured with correct VLSM masks (`/26`, `/27`, `/30`).\n\
+    - `show ip route` on both routers contains both directly connected routes and\
+    \ the static route (`S`).\n- 100% ping success between `PC-Sales` and `PC-Eng`.\n\
+    - *Need a hint? Check the interactive workbook in `~/ccna-study/labs/lab17-multi-subnet-routing.html`.*"
+  version: 0.3.1
+  node_staging:
+    enabled: false
+    start_remaining: true
+    abort_on_failure: false
+nodes:
+- id: n0
+  label: R1
+  node_definition: iosv
+  x: -180
+  y: -120
+  interfaces:
+  - id: i0
+    label: Loopback0
+    type: loopback
+  - id: i1
+    label: GigabitEthernet0/0
+    type: physical
+    slot: 0
+  - id: i2
+    label: GigabitEthernet0/1
+    type: physical
+    slot: 1
+  configuration:
+  - name: ios_config.txt
+    content: "hostname R1\ninterface GigabitEthernet0/0\n description WAN to R2 (Subnet\
+      \ C)\n ip address 192.168.100.97 255.255.255.252\n no shutdown\n!\ninterface\
+      \ GigabitEthernet0/1\n description Sales LAN Gateway (Subnet A)\n ip address\
+      \ 192.168.100.1 255.255.255.192\n no shutdown\n!\nline con 0\n exec-timeout\
+      \ 0 0\n logging synchronous\nend\n"
+- id: n1
+  label: R2
+  node_definition: iosv
+  x: 180
+  y: -120
+  interfaces:
+  - id: i0
+    label: Loopback0
+    type: loopback
+  - id: i1
+    label: GigabitEthernet0/0
+    type: physical
+    slot: 0
+  - id: i2
+    label: GigabitEthernet0/1
+    type: physical
+    slot: 1
+  configuration:
+  - name: ios_config.txt
+    content: "hostname R2\ninterface GigabitEthernet0/0\n description WAN to R1 (Subnet\
+      \ C)\n ip address 192.168.100.98 255.255.255.252\n no shutdown\n!\ninterface\
+      \ GigabitEthernet0/1\n description Engineering LAN Gateway (Subnet B)\n ip address\
+      \ 192.168.100.65 255.255.255.224\n no shutdown\n!\nline con 0\n exec-timeout\
+      \ 0 0\n logging synchronous\nend\n"
+- id: n2
+  label: PC-Sales
+  node_definition: alpine
+  x: -180
+  y: 120
+  interfaces:
+  - id: i0
+    label: eth0
+    type: physical
+    slot: 0
+- id: n3
+  label: PC-Eng
+  node_definition: alpine
+  x: 180
+  y: 120
+  interfaces:
+  - id: i0
+    label: eth0
+    type: physical
+    slot: 0
+links:
+- id: l0
+  n1: n0
+  n2: n1
+  i1: i1
+  i2: i1
+  label: R1-Gi0/0<->R2-Gi0/0
+- id: l1
+  n1: n2
+  n2: n0
+  i1: i0
+  i2: i2
+  label: PC-Sales-eth0<->R1-Gi0/1
+- id: l2
+  n1: n3
+  n2: n1
+  i1: i0
+  i2: i2
+  label: PC-Eng-eth0<->R2-Gi0/1
+annotations: []
+smart_annotations: []

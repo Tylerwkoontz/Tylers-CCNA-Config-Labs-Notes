@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab 03: End-to-End Packet Delivery & ARP Resolution | Tyler's CCNA Lab Hub</title>
+    <style>
+        :root {
+            --bg-body: #0b0f19;
+            --bg-card: #151e2e;
+            --bg-inner: #0f172a;
+            --bg-code: #070a12;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-blue: #0284c7;
+            --accent-cyan: #38bdf8;
+            --accent-green: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-purple: #8b5cf6;
+            --border-color: #223049;
+            --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        }
+
+        body {
+            margin: 0;
+            padding: 32px 20px;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: var(--font);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1040px;
+            margin: 0 auto;
+        }
+
+        .top-nav {
+            margin-bottom: 20px;
+        }
+        .top-nav a {
+            color: var(--accent-cyan);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        .top-nav a:hover { text-decoration: underline; }
+
+        .lab-header {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 24px 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.4);
+        }
+
+        .badge-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-blue   { background: #0369a1; color: #e0f2fe; }
+        .badge-purple { background: #581c87; color: #f3e8ff; }
+        .badge-amber  { background: #b45309; color: #fef3c7; }
+        .badge-green  { background: #047857; color: #d1fae5; }
+
+        h1 { margin: 0 0 10px 0; font-size: 1.85rem; color: #ffffff; letter-spacing: -0.5px; }
+        h2 { font-size: 1.25rem; color: var(--accent-cyan); margin: 0 0 16px 0; display: flex; align-items: center; gap: 8px; }
+        h3 { font-size: 1.05rem; color: #ffffff; margin: 18px 0 10px 0; }
+        p { margin: 0 0 12px 0; }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .topology-svg {
+            width: 100%;
+            height: auto;
+            max-height: 220px;
+            background: var(--bg-code);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin: 14px 0 6px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            font-size: 0.88rem;
+        }
+
+        th, td {
+            padding: 10px 14px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--bg-inner);
+            color: var(--accent-cyan);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.78rem;
+            letter-spacing: 0.5px;
+        }
+
+        tr:hover { background-color: rgba(255, 255, 255, 0.02); }
+
+        .baseline-box {
+            background: var(--bg-inner);
+            border-left: 4px solid var(--accent-amber);
+            border-radius: 6px;
+            padding: 14px 18px;
+            margin: 16px 0 0 0;
+            font-size: 0.9rem;
+        }
+        .baseline-box strong { color: var(--accent-amber); }
+
+        .req-group {
+            margin-bottom: 22px;
+        }
+        .req-group:last-child {
+            margin-bottom: 0;
+        }
+        .req-group h3 {
+            font-size: 1.05rem;
+            color: var(--accent-cyan);
+            margin: 0 0 10px 0;
+            font-weight: 700;
+        }
+        .clean-list {
+            margin: 0;
+            padding-left: 24px;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+        .clean-list li {
+            margin-bottom: 8px;
+        }
+        .clean-list li:last-child {
+            margin-bottom: 0;
+        }
+        .clean-list strong {
+            color: #ffffff;
+        }
+
+        .verif-step {
+            background: var(--bg-inner);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 14px;
+        }
+
+        .verif-title {
+            font-weight: 700;
+            color: #ffffff;
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .code-block {
+            position: relative;
+            margin: 10px 0 0 0;
+        }
+
+        pre {
+            background-color: var(--bg-code);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 14px 16px;
+            overflow-x: auto;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: #e2e8f0;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #223049;
+            color: #f8fafc;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            padding: 5px 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover { background: var(--accent-blue); border-color: var(--accent-blue); }
+
+        details.solution-drawer {
+            border-top: 4px solid var(--accent-green);
+            cursor: default;
+        }
+
+        details.solution-drawer summary {
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            user-select: none;
+            padding: 4px 0;
+        }
+
+        details.solution-drawer summary::-webkit-details-marker {
+            display: none;
+        }
+
+        details.solution-drawer summary:hover {
+            color: #ffffff;
+        }
+
+        .solution-badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            background: #1e293b;
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            transition: all 0.2s;
+        }
+
+        details[open].solution-drawer .solution-badge {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--accent-green);
+            border-color: var(--accent-green);
+        }
+
+        .tabs-header {
+            display: flex;
+            gap: 8px;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 16px;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 10px 18px;
+            font-size: 0.92rem;
+            font-weight: 700;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover { color: #ffffff; }
+        .tab-btn.active {
+            color: var(--accent-cyan);
+            border-bottom-color: var(--accent-cyan);
+        }
+
+        .tab-pane { display: none; }
+        .tab-pane.active { display: block; }
+
+        .commentary-section {
+            background: var(--bg-inner);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 18px 20px;
+            margin-bottom: 16px;
+            font-size: 0.92rem;
+        }
+        .commentary-section h4 {
+            margin: 0 0 8px 0;
+            color: var(--accent-amber);
+            font-size: 1rem;
+        }
+        .commentary-section p { margin-bottom: 10px; }
+        .commentary-section p:last-child { margin-bottom: 0; }
+        .commentary-section code {
+            background: var(--bg-code);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: var(--accent-cyan);
+            font-family: var(--font-mono);
+            font-size: 0.85em;
+        }
+
+        @media print {
+            body { background: #ffffff; color: #000000; padding: 0; }
+            .lab-header, .card, .verif-step, .commentary-section, .baseline-box { border: 1px solid #ccc; box-shadow: none; background: #ffffff; color: #000000; }
+            h1, h2, h3, .verif-title, details.solution-drawer summary { color: #000000 !important; }
+            pre { background: #f8f9fa; color: #000000; border: 1px solid #ddd; }
+            .copy-btn, .top-nav, .solution-badge { display: none !important; }
+            details.solution-drawer { display: block !important; }
+            details.solution-drawer .solution-content { display: block !important; margin-top: 0 !important; }
+            .tab-pane { display: block !important; margin-bottom: 20px; }
+            .tabs-header { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Top Navigation Breadcrumb -->
+    <div class="top-nav">
+        <a href="../index.html">&larr; Back to Master Dashboard</a>
+    </div>
+
+    <!-- 1. HEADER & METADATA -->
+    <div class="lab-header">
+        <div class="badge-group">
+            <span class="badge badge-blue">CCNA 200-301 (Domains 1.1, 1.3 & 3.1)</span>
+            <span class="badge badge-purple">CertSkills Config Lab #03</span>
+            <span class="badge badge-amber">Fundamental</span>
+            <span class="badge badge-green">Est: 25 Mins</span>
+        </div>
+        <h1>Lab 03: End-to-End Packet Delivery & ARP Resolution</h1>
+        <p style="color: var(--text-muted); margin: 0;">
+            <strong>Curriculum Focus:</strong> Cisco Press Official Cert Guide Vol 1, Part I (Chapter 3) • <strong>Topics:</strong> Host Subnet Logic, Default Gateway Forwarding, Address Resolution Protocol (ARP), and Layer 2 Frame Header De-encapsulation & MAC Rewrite.
+        </p>
+    </div>
+
+    <!-- 2. TOPOLOGY, ADDRESSING & INITIAL STATE -->
+    <div class="card">
+        <h2>🗺️ Topology, Addressing & Initial State</h2>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">
+            <strong>Scenario:</strong> You are deploying a routed boundary between two branch subnets (Subnet A: <code>10.1.1.0/24</code> and Subnet B: <code>10.1.2.0/24</code>) connected via Router <code>R1</code>. You must configure gateway addressing, examine how hosts evaluate local vs. remote destinations, observe the ARP resolution process, and trace how Layer 2 MAC addresses change hop-by-hop while Layer 3 IP headers remain constant.
+        </p>
+
+        <!-- Hierarchical Vector SVG Diagram -->
+        <svg class="topology-svg" viewBox="0 0 800 240" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                    <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#1e293b" stroke-width="0.5"/>
+                </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grid)" />
+
+            <!-- Tier Background Bands -->
+            <rect x="20" y="15" width="760" height="90" rx="6" fill="#1e293b" fill-opacity="0.3" stroke="#334155" stroke-dasharray="4,4"/>
+            <text x="35" y="32" fill="#f59e0b" font-size="10" font-weight="bold" letter-spacing="1">🏢 DISTRIBUTION & ROUTED GATEWAY TIER</text>
+
+            <rect x="20" y="130" width="760" height="95" rx="6" fill="#1e293b" fill-opacity="0.3" stroke="#334155" stroke-dasharray="4,4"/>
+            <text x="35" y="147" fill="#38bdf8" font-size="10" font-weight="bold" letter-spacing="1">💻 ENDPOINT & ACCESS SUBNET TIER</text>
+
+            <!-- Downlinks from R1 to Hosts -->
+            <line x1="380" y1="85" x2="220" y2="160" stroke="#38bdf8" stroke-width="3" />
+            <line x1="420" y1="85" x2="580" y2="160" stroke="#10b981" stroke-width="3" />
+
+            <!-- R1 (Top) -->
+            <circle cx="400" cy="62" r="30" fill="#151e2e" stroke="#f59e0b" stroke-width="2"/>
+            <text x="400" y="67" fill="#f59e0b" font-size="14" font-weight="bold" text-anchor="middle">R1</text>
+            <text x="400" y="28" fill="#fef3c7" font-size="9" text-anchor="middle">Default Gateway Router</text>
+            <text x="290" y="105" fill="#38bdf8" font-size="9">Gi0/1 (.1)</text>
+            <text x="480" y="105" fill="#10b981" font-size="9">Gi0/2 (.1)</text>
+
+            <!-- PC1 (Bottom Left) -->
+            <circle cx="220" cy="180" r="26" fill="#151e2e" stroke="#38bdf8" stroke-width="2"/>
+            <text x="220" y="184" fill="#f8fafc" font-size="11" font-weight="bold" text-anchor="middle">PC1</text>
+            <text x="220" y="218" fill="#94a3b8" font-size="9" text-anchor="middle">10.1.1.10/24 (Subnet A)</text>
+            <text x="225" y="152" fill="#38bdf8" font-size="9">eth0</text>
+
+            <!-- PC2 (Bottom Right) -->
+            <circle cx="580" cy="180" r="26" fill="#151e2e" stroke="#10b981" stroke-width="2"/>
+            <text x="580" y="184" fill="#f8fafc" font-size="11" font-weight="bold" text-anchor="middle">PC2</text>
+            <text x="580" y="218" fill="#94a3b8" font-size="9" text-anchor="middle">10.1.2.20/24 (Subnet B)</text>
+            <text x="585" y="152" fill="#10b981" font-size="9">eth0</text>
+        </svg>
+
+        <!-- Addressing & MAC Specification Table -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Device</th>
+                    <th>Interface</th>
+                    <th>IPv4 Address</th>
+                    <th>Subnet Mask</th>
+                    <th>Default Gateway</th>
+                    <th>Layer 2 MAC Address</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>PC1</strong></td>
+                    <td><code>eth0</code></td>
+                    <td><code>10.1.1.10</code></td>
+                    <td><code>255.255.255.0</code></td>
+                    <td><code>10.1.1.1</code></td>
+                    <td><code>5000.0001.0001</code></td>
+                </tr>
+                <tr>
+                    <td><strong>R1</strong></td>
+                    <td><code>GigabitEthernet0/1</code></td>
+                    <td><code>10.1.1.1</code></td>
+                    <td><code>255.255.255.0</code></td>
+                    <td>N/A</td>
+                    <td><code>0000.5E00.0101</code></td>
+                </tr>
+                <tr>
+                    <td><strong>R1</strong></td>
+                    <td><code>GigabitEthernet0/2</code></td>
+                    <td><code>10.1.2.1</code></td>
+                    <td><code>255.255.255.0</code></td>
+                    <td>N/A</td>
+                    <td><code>0000.5E00.0201</code></td>
+                </tr>
+                <tr>
+                    <td><strong>PC2</strong></td>
+                    <td><code>eth0</code></td>
+                    <td><code>10.1.2.20</code></td>
+                    <td><code>255.255.255.0</code></td>
+                    <td><code>10.1.2.1</code></td>
+                    <td><code>5000.0002.0002</code></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Initial Device State -->
+        <div class="baseline-box">
+            <strong>Initial Baseline State:</strong> Router R1 is running factory default configuration with all interfaces administratively shutdown. PC1 and PC2 have their IP addresses configured but empty ARP cache tables.
+        </div>
+    </div>
+
+    <!-- 3. ENGINEERING REQUIREMENTS SPECIFICATION -->
+    <div class="card">
+        <h2>📋 Engineering Requirements</h2>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">
+            Configure the router and trace the end-to-end packet forwarding and ARP resolution logic.
+        </p>
+
+        <div class="req-group">
+            <h3>1. Device Identification & Interface Addressing:</h3>
+            <ul class="clean-list">
+                <li>Configure the device hostname to <strong>R1</strong>.</li>
+                <li>Configure line <code>con 0</code> with <code>logging synchronous</code> and <code>exec-timeout 0 0</code>.</li>
+                <li>Configure interface <code>GigabitEthernet0/1</code> with IPv4 address <code>10.1.1.1 255.255.255.0</code> and a descriptive description. Enable the interface and bring the interface up.</li>
+                <li>Configure interface <code>GigabitEthernet0/2</code> with IPv4 address <code>10.1.2.1 255.255.255.0</code> and a descriptive description. Enable the interface and bring the interface up.</li>
+            </ul>
+        </div>
+
+        <div class="req-group">
+            <h3>2. Host Endpoint Provisioning:</h3>
+            <ul class="clean-list">
+                <li>Configure <strong>PC1</strong> with IPv4 address <code>10.1.1.10</code>, subnet mask <code>255.255.255.0</code>, and default gateway <code>10.1.1.1</code>.</li>
+                <li>Configure <strong>PC2</strong> with IPv4 address <code>10.1.2.20</code>, subnet mask <code>255.255.255.0</code>, and default gateway <code>10.1.2.1</code>.</li>
+            </ul>
+        </div>
+
+        <div class="req-group">
+            <h3>3. Host Routing Evaluation & ARP Resolution:</h3>
+            <ul class="clean-list">
+                <li>Analyze the host routing logic when <strong>PC1</strong> prepares to send an ICMP packet to <strong>PC2</strong> (<code>10.1.2.20</code>): explain why PC1 targets the default gateway instead of sending directly to PC2.</li>
+                <li>From <strong>PC1</strong>, initiate an ICMP ping to <code>10.1.2.20</code>.</li>
+                <li>Inspect PC1's ARP cache table (<code>arp -n</code>) and verify that PC1 resolves only the MAC address of its default gateway (<code>R1 Gi0/1</code>), not PC2's MAC address.</li>
+            </ul>
+        </div>
+
+        <div class="req-group">
+            <h3>4. Router Layer 2 Header De-encapsulation & MAC Rewrite:</h3>
+            <ul class="clean-list">
+                <li>Inspect the ARP table on <strong>R1</strong> using <code>show ip arp</code> to confirm that R1 holds ARP entries for both <code>PC1 (10.1.1.10)</code> on Gi0/1 and <code>PC2 (10.1.2.20)</code> on Gi0/2.</li>
+                <li>Verify how R1 strips the incoming Ethernet header from PC1, decrements the IP TTL by 1, and encapsulates the packet into a new Ethernet frame destined for PC2's MAC address before forwarding out Gi0/2.</li>
+            </ul>
+        </div>
+
+        <div class="req-group">
+            <h3>5. Configuration Persistence:</h3>
+            <ul class="clean-list">
+                <li>Save the active running configuration to NVRAM on router <strong>R1</strong>.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 4. VERIFICATION & VALIDATION -->
+    <div class="card">
+        <h2>🔍 Verification & Validation Steps</h2>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">
+            Run these verification commands on the router and endpoints to inspect ARP tables and packet flow.
+        </p>
+
+        <!-- Step 1 -->
+        <div class="verif-step">
+            <div class="verif-title">
+                <span>1. Verify Connected Routes on R1</span>
+            </div>
+            <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 6px;">Confirm both connected subnets appear in the routing table:</p>
+            <div class="code-block">
+                <pre><code>R1# show ip route connected
+C        10.1.1.0/24 is directly connected, GigabitEthernet0/1
+C        10.1.2.0/24 is directly connected, GigabitEthernet0/2</code></pre>
+            </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="verif-step">
+            <div class="verif-title">
+                <span>2. Inspect Router ARP Cache Table</span>
+            </div>
+            <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 6px;">Execute <code>show ip arp</code> on R1 to verify resolved host MAC addresses:</p>
+            <div class="code-block">
+                <pre><code>R1# show ip arp
+Protocol  Address          Age (min)  Hardware Addr   Type   Interface
+Internet  10.1.1.1                -   0000.5e00.0101  ARPA   GigabitEthernet0/1
+Internet  10.1.1.10               2   5000.0001.0001  ARPA   GigabitEthernet0/1
+Internet  10.1.2.1                -   0000.5e00.0201  ARPA   GigabitEthernet0/2
+Internet  10.1.2.20               2   5000.0002.0002  ARPA   GigabitEthernet0/2</code></pre>
+            </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="verif-step">
+            <div class="verif-title">
+                <span>3. Inspect Endpoint ARP Cache Table</span>
+            </div>
+            <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 6px;">On <strong>PC1</strong>, view the ARP cache. Notice that PC1 knows ONLY the Default Gateway MAC:</p>
+            <div class="code-block">
+                <pre><code>PC1:~$ arp -n
+? (10.1.1.1) at 00:00:5e:00:01:01 [ether]  on eth0</code></pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. COMPLETED CONFIGURATIONS & LAB COMMENTARY (SPOILER-FREE DRAWER) -->
+    <details class="card solution-drawer">
+        <summary>
+            <span>✅ Completed Configurations & Engineering Deep-Dive & Exam Pitfalls</span>
+            <span class="solution-badge">Click to Reveal</span>
+        </summary>
+        <div class="solution-content" style="margin-top: 18px;">
+            <p style="color: var(--text-muted); font-size: 0.9rem;">
+                Review the completed device configurations, hop-by-hop packet encapsulation trace, and in-depth lab commentary.
+            </p>
+
+            <!-- Tab Controls -->
+            <div class="tabs-header">
+                <button class="tab-btn active" onclick="showTab('tab-r1', this)">Router 1 (R1)</button>
+                <button class="tab-btn" onclick="showTab('tab-hosts', this)">PC Endpoints</button>
+                <button class="tab-btn" onclick="showTab('tab-encap', this)">🔬 Hop-by-Hop Packet Trace</button>
+                <button class="tab-btn" onclick="showTab('tab-commentary', this)">🎓 Engineering Deep-Dive & Exam Pitfalls</button>
+            </div>
+
+            <!-- Tab 1: R1 -->
+            <div class="tab-pane active" id="tab-r1">
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy R1 Config</button>
+                    <pre><code>enable
+configure terminal
+!
+hostname R1
+!
+line con 0
+ logging synchronous
+ exec-timeout 0 0
+!
+interface GigabitEthernet0/1
+ description Subnet A Gateway (to PC1)
+ ip address 10.1.1.1 255.255.255.0
+ no shutdown
+!
+interface GigabitEthernet0/2
+ description Subnet B Gateway (to PC2)
+ ip address 10.1.2.1 255.255.255.0
+ no shutdown
+!
+end
+write memory</code></pre>
+                </div>
+            </div>
+
+            <!-- Tab 2: PC Endpoints -->
+            <div class="tab-pane" id="tab-hosts">
+                <p style="font-size: 0.85rem; color: var(--text-muted);">Alpine Linux CLI Commands:</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy Host Commands</button>
+                    <pre><code># PC1 Configuration & Ping Test:
+ip addr add 10.1.1.10/24 dev eth0
+ip route add default via 10.1.1.1
+ip link set eth0 up
+ping -c 4 10.1.2.20
+
+# PC2 Configuration:
+ip addr add 10.1.2.20/24 dev eth0
+ip route add default via 10.1.2.1
+ip link set eth0 up
+ping -c 4 10.1.1.10</code></pre>
+                </div>
+            </div>
+
+            <!-- Tab 3: Hop-by-Hop Packet Trace -->
+            <div class="tab-pane" id="tab-encap">
+                <h4>🔬 Packet Encapsulation Across Hops (PC1 &rarr; PC2)</h4>
+                <p style="font-size: 0.85rem; color: var(--text-muted);">Notice how Layer 2 MAC addresses change at each router boundary while Layer 3 IP addresses remain constant:</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Segment / Hop</th>
+                            <th>Source MAC</th>
+                            <th>Destination MAC</th>
+                            <th>Source IP</th>
+                            <th>Destination IP</th>
+                            <th>TTL</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Hop 1: PC1 &rarr; R1</strong> (on Gi0/1 link)</td>
+                            <td><code>5000.0001.0001</code> (PC1)</td>
+                            <td><code>0000.5E00.0101</code> (R1 Gi0/1)</td>
+                            <td><code>10.1.1.10</code></td>
+                            <td><code>10.1.2.20</code></td>
+                            <td>64</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Hop 2: R1 &rarr; PC2</strong> (on Gi0/2 link)</td>
+                            <td><code>0000.5E00.0201</code> (R1 Gi0/2)</td>
+                            <td><code>5000.0002.0002</code> (PC2)</td>
+                            <td><code>10.1.1.10</code></td>
+                            <td><code>10.1.2.20</code></td>
+                            <td>63 (-1)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Tab 4: Engineering Deep-Dive & Exam Pitfalls -->
+            <div class="tab-pane" id="tab-commentary">
+                <div class="commentary-section">
+                    <h4>🔬 Architectural Breakdown & Design Logic</h4>
+                    <p>
+                        This lab covers the single most fundamental packet-delivery process in computer networking, as explained in Cisco Press Volume 1, Chapter 3.
+                    </p>
+                </div>
+
+                <div class="commentary-section">
+                    <h4>1. Host Routing Logic: Local vs. Remote Subnet</h4>
+                    <p>
+                        Before an endpoint sends an IPv4 packet, its TCP/IP stack performs a bitwise comparison:
+                    </p>
+                    <ul>
+                        <li><strong>Rule</strong>: Compare the destination IPv4 address against the host's own IPv4 address using the configured subnet mask.</li>
+                        <li><strong>Local Destination</strong>: If the destination is in the same subnet (e.g. <code>10.1.1.15</code>), the host sends an ARP request directly for the destination host's MAC.</li>
+                        <li><strong>Remote Destination</strong>: If the destination is in a different subnet (e.g. <code>10.1.2.20</code>), the host <em>never</em> attempts to ARP for the remote host. Instead, it looks up the MAC address of its configured <strong>Default Gateway</strong> (<code>10.1.1.1</code>) and forwards the frame to the router!</li>
+                    </ul>
+                </div>
+
+                <div class="commentary-section">
+                    <h4>2. ARP Broadcast vs. Unicast Reply Mechanics</h4>
+                    <p>
+                        When PC1 does not have the gateway MAC in its ARP table:
+                    </p>
+                    <ul>
+                        <li><strong>ARP Request</strong>: Sent as a Layer 2 broadcast (<code>FF:FF:FF:FF:FF:FF</code>) asking: <em>"Who has 10.1.1.1? Tell 10.1.1.10"</em>. All devices in VLAN/Subnet A process the broadcast.</li>
+                        <li><strong>ARP Reply</strong>: Router R1 recognizes its own IP, records PC1's MAC in its ARP table, and replies with a Layer 2 <strong>unicast</strong> frame containing its physical MAC address (<code>0000.5E00.0101</code>).</li>
+                    </ul>
+                </div>
+
+                <div class="commentary-section">
+                    <h4>3. The Layer 2 Frame Rewrite Process</h4>
+                    <p>
+                        When Router R1 receives the frame on <code>Gi0/1</code>:
+                    </p>
+                    <ol>
+                        <li>It verifies the Frame Check Sequence (FCS) to confirm no bit errors occurred.</li>
+                        <li>It strips (de-encapsulates) the Layer 2 Ethernet header and trailer.</li>
+                        <li>It decrements the IP header <strong>Time-to-Live (TTL)</strong> field by 1 (if TTL reaches 0, the packet is discarded and an ICMP Time Exceeded is returned).</li>
+                        <li>It recalculates the IPv4 header checksum.</li>
+                        <li>It consults its routing table for destination <code>10.1.2.20</code>, identifying outgoing interface <code>Gi0/2</code>.</li>
+                        <li>It encapsulates the IP packet in a <strong>brand new Layer 2 Ethernet header</strong> with Source MAC = <code>R1 Gi0/2</code> and Destination MAC = <code>PC2</code> before transmitting.</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </details>
+
+</div>
+
+<script>
+    // 1-Click Copy Function
+    function copyCode(btn) {
+        const pre = btn.nextElementSibling;
+        navigator.clipboard.writeText(pre.innerText).then(() => {
+            const originalText = btn.innerText;
+            btn.innerText = "Copied!";
+            btn.style.background = "#10b981";
+            btn.style.borderColor = "#10b981";
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.style.background = "#223049";
+                btn.style.borderColor = "#334155";
+            }, 2000);
+        });
+    }
+
+    // Solution Tabs Switcher
+    function showTab(tabId, btn) {
+        document.querySelectorAll(".tab-pane").forEach(pane => pane.classList.remove("active"));
+        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+        document.getElementById(tabId).classList.add("active");
+        btn.classList.add("active");
+    }
+</script>
+
+</body>
+</html>

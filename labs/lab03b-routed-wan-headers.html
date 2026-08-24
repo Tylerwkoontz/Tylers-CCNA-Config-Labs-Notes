@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab 03B: Multi-Hop Routed WAN & Layer 2 Header Transformation | Tyler's CCNA Lab Hub</title>
+    <style>
+        :root {
+            --bg-body: #0b0f19;
+            --bg-card: #151e2e;
+            --bg-inner: #0f172a;
+            --bg-code: #070a12;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-blue: #0284c7;
+            --accent-cyan: #38bdf8;
+            --accent-green: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-purple: #8b5cf6;
+            --border-color: #223049;
+            --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        }
+
+        body {
+            margin: 0;
+            padding: 32px 20px;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: var(--font);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1040px;
+            margin: 0 auto;
+        }
+
+        .top-nav {
+            margin-bottom: 20px;
+        }
+        .top-nav a {
+            color: var(--accent-cyan);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        .top-nav a:hover { text-decoration: underline; }
+
+        .lab-header {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 24px 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.4);
+        }
+
+        .badge-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-blue   { background: #0369a1; color: #e0f2fe; }
+        .badge-purple { background: #581c87; color: #f3e8ff; }
+        .badge-amber  { background: #b45309; color: #fef3c7; }
+        .badge-green  { background: #047857; color: #d1fae5; }
+
+        h1 { margin: 0 0 10px 0; font-size: 1.85rem; color: #ffffff; letter-spacing: -0.5px; }
+        h2 { font-size: 1.25rem; color: var(--accent-cyan); margin: 0 0 16px 0; display: flex; align-items: center; gap: 8px; }
+        h3 { font-size: 1.05rem; color: #ffffff; margin: 18px 0 10px 0; }
+        p { margin: 0 0 12px 0; }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .topology-svg {
+            width: 100%;
+            height: auto;
+            max-height: 220px;
+            background: var(--bg-code);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin: 14px 0 6px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            font-size: 0.88rem;
+        }
+
+        th, td {
+            padding: 10px 14px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--bg-inner);
+            color: var(--accent-cyan);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.78rem;
+            letter-spacing: 0.5px;
+        }
+
+        tr:hover { background-color: rgba(255, 255, 255, 0.02); }
+
+        .baseline-box {
+            background: var(--bg-inner);
+            border-left: 4px solid var(--accent-amber);
+            border-radius: 6px;
+            padding: 14px 18px;
+            margin: 16px 0 0 0;
+            font-size: 0.9rem;
+        }
+        .baseline-box strong { color: var(--accent-amber); }
+
+        .req-group {
+            margin-bottom: 22px;
+        }
+        .req-group:last-child {
+            margin-bottom: 0;
+        }
+        .req-group h3 {
+            font-size: 1.05rem;
+            color: var(--accent-cyan);
+            margin: 0 0 10px 0;
+            font-weight: 700;
+        }
+        .clean-list {
+            margin: 0;
+            padding-left: 24px;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+        .clean-list li {
+            margin-bottom: 8px;
+        }
+        .clean-list li:last-child {
+            margin-bottom: 0;
+        }
+        .clean-list strong {
+            color: #ffffff;
+        }
+
+        .verif-step {
+            background: var(--bg-inner);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 14px;
+        }
+
+        .verif-title {
+            font-weight: 700;
+            color: #ffffff;
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .code-block {
+            position: relative;
+            margin: 10px 0 0 0;
+        }
+
+        pre {
+            background-color: var(--bg-code);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 14px 16px;
+            overflow-x: auto;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: #e2e8f0;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #223049;
+            color: #f8fafc;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            padding: 5px 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover { background: var(--accent-blue); border-color: var(--accent-blue); }
+
+        details.solution-drawer {
+            border-top: 4px solid var(--accent-green);
+            cursor: default;
+        }
+
+        details.solution-drawer summary {
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            user-select: none;
+            padding: 4px 0;
+        }
+
+        details.solution-drawer summary::-webkit-details-marker {
+            display: none;
+        }
+
+        details.solution-drawer summary:hover {
+            color: #ffffff;
+        }
+
+        .solution-badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            background: #1e293b;
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            transition: all 0.2s;
+        }
+
+        details[open].solution-drawer .solution-badge {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--accent-green);
+            border-color: var(--accent-green);
+        }
+
+        .tabs-header {
+            display: flex;
+            gap: 8px;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 16px;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 10px 18px;
+            font-size: 0.92rem;
+            font-weight: 700;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover { color: #ffffff; }
+        .tab-btn.active {
+            color: var(--accent-cyan);
+            border-bottom-color: var(--accent-cyan);
+        }
+
+        .tab-pane { display: none; }
+        .tab-pane.active { display: block; }
+
+        .commentary-section {
+            background: var(--bg-inner);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 18px 20px;
+            margin-bottom: 16px;
+            font-size: 0.92rem;
+        }
+        .commentary-section h4 {
+            margin: 0 0 8px 0;
+            color: var(--accent-amber);
+            font-size: 1rem;
+        }
+        .commentary-section p { margin-bottom: 10px; }
+        .commentary-section p:last-child { margin-bottom: 0; }
+        .commentary-section code {
+            background: var(--bg-code);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: var(--accent-cyan);
+            font-family: var(--font-mono);
+            font-size: 0.85em;
+        }
+
+        @media print {
+            body { background: #ffffff; color: #000000; padding: 0; }
+            .lab-header, .card, .verif-step, .commentary-section, .baseline-box { border: 1px solid #ccc; box-shadow: none; background: #ffffff; color: #000000; }
+            h1, h2, h3, .verif-title, details.solution-drawer summary { color: #000000 !important; }
+            pre { background: #f8f9fa; color: #000000; border: 1px solid #ddd; }
+            .copy-btn, .top-nav, .solution-badge { display: none !important; }
+            details.solution-drawer { display: block !important; }
+            details.solution-drawer .solution-content { display: block !important; margin-top: 0 !important; }
+            .tab-pane { display: block !important; margin-bottom: 20px; }
+            .tabs-header { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Top Navigation Breadcrumb -->
+    <div class="top-nav">
+        <a href="../index.html">&larr; Back to Master Dashboard</a>
+    </div>
+
+    <!-- 1. HEADER & METADATA -->
+    <div class="lab-header">
+        <div class="badge-group">
+            <span class="badge badge-blue">CCNA 200-301 (Domains 1.1, 1.2 & 3.1)</span>
+            <span class="badge badge-purple">CertSkills Config Lab #03B</span>
+            <span class="badge badge-amber">Fundamental</span>
+            <span class="badge badge-green">Est: 30 Mins</span>
+        </div>
+        <h1>Lab 03B: Multi-Hop Routed WAN & Layer 2 Header Transformation</h1>
+        <p style="color: var(--text-muted); margin: 0;">
+            <strong>Curriculum Focus:</strong> Cisco Press Official Cert Guide Vol 1, Part I (Chapter 3) • <strong>Topics:</strong> Multi-Hop Routing, Ethernet LAN vs Point-to-Point WAN Framing, Layer 2 Header Transformation, and IP Header Invariance.
+        </p>
+    </div>
+
+    <!-- 2. TOPOLOGY, ADDRESSING & INITIAL STATE -->
+    <div class="card">
+        <h2>🗺️ Topology, Addressing & Initial State</h2>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">
+            <strong>Scenario:</strong> You are deploying an enterprise branch connection linking Site A (<code>10.1.1.0/24</code>) to Site B (<code>10.1.2.0/24</code>) across a Point-to-Point routed WAN link (<code>10.1.12.0/30</code>). You must configure router interfaces, establish static routing between R1 and R2, and trace how Layer 2 encapsulation morphs across each link while Layer 3 IP headers remain unchanged.
+        </p>
+
+        <!-- Hierarchical Vector SVG Diagram -->
+        <svg class="topology-svg" viewBox="0 0 800 240" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                    <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#1e293b" stroke-width="0.5"/>
+                </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grid)" />
+
+            <!-- Tier Background Bands -->
+            <rect x="20" y="15" width="760" height="95" rx="6" fill="#1e293b" fill-opacity="0.3" stroke="#334155" stroke-dasharray="4,4"/>
+            <text x="35" y="32" fill="#f59e0b" font-size="10" font-weight="bold" letter-spacing="1">🏢 CORE & WAN ROUTING TIER</text>
+
+            <rect x="20" y="130" width="760" height="95" rx="6" fill="#1e293b" fill-opacity="0.3" stroke="#334155" stroke-dasharray="4,4"/>
+            <text x="35" y="147" fill="#38bdf8" font-size="10" font-weight="bold" letter-spacing="1">💻 SITE ENDPOINT & ACCESS TIER</text>
+
+            <!-- WAN Horizontal Link -->
+            <line x1="290" y1="62" x2="510" y2="62" stroke="#f59e0b" stroke-width="4" stroke-dasharray="8,4"/>
+            <rect x="340" y="48" width="120" height="24" rx="4" fill="#78350f"/>
+            <text x="400" y="64" fill="#fef3c7" font-size="9" font-weight="bold" text-anchor="middle">WAN: 10.1.12.0/30</text>
+
+            <!-- Downlinks to Hosts -->
+            <line x1="260" y1="92" x2="260" y2="155" stroke="#38bdf8" stroke-width="3" />
+            <line x1="540" y1="92" x2="540" y2="155" stroke="#10b981" stroke-width="3" />
+
+            <!-- R1 (Top Left) -->
+            <circle cx="260" cy="62" r="28" fill="#151e2e" stroke="#f59e0b" stroke-width="2"/>
+            <text x="260" y="67" fill="#f59e0b" font-size="13" font-weight="bold" text-anchor="middle">R1</text>
+            <text x="295" y="55" fill="#f59e0b" font-size="9">Gi0/0 (.1)</text>
+            <text x="265" y="110" fill="#38bdf8" font-size="9">Gi0/1 (.1)</text>
+
+            <!-- R2 (Top Right) -->
+            <circle cx="540" cy="62" r="28" fill="#151e2e" stroke="#f59e0b" stroke-width="2"/>
+            <text x="540" y="67" fill="#f59e0b" font-size="13" font-weight="bold" text-anchor="middle">R2</text>
+            <text x="475" y="55" fill="#f59e0b" font-size="9">Gi0/0 (.2)</text>
+            <text x="545" y="110" fill="#10b981" font-size="9">Gi0/1 (.1)</text>
+
+            <!-- PC1 (Bottom Left) -->
+            <circle cx="260" cy="180" r="26" fill="#151e2e" stroke="#38bdf8" stroke-width="2"/>
+            <text x="260" y="184" fill="#f8fafc" font-size="11" font-weight="bold" text-anchor="middle">PC1</text>
+            <text x="260" y="218" fill="#94a3b8" font-size="9" text-anchor="middle">Site A (10.1.1.10/24)</text>
+            <text x="265" y="150" fill="#38bdf8" font-size="9">eth0</text>
+
+            <!-- PC2 (Bottom Right) -->
+            <circle cx="540" cy="180" r="26" fill="#151e2e" stroke="#10b981" stroke-width="2"/>
+            <text x="540" y="184" fill="#f8fafc" font-size="11" font-weight="bold" text-anchor="middle">PC2</text>
+            <text x="540" y="218" fill="#94a3b8" font-size="9" text-anchor="middle">Site B (10.1.2.20/24)</text>
+            <text x="545" y="150" fill="#10b981" font-size="9">eth0</text>
+        </svg>
+
+        <!-- Addressing Table -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Device</th>
+                    <th>Interface</th>
+                    <th>IPv4 Address</th>
+                    <th>Subnet Mask</th>
+                    <th>Default Gateway</th>
+                    <th>Layer 2 Link Type</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>PC1</strong></td>
+                    <td><code>eth0</code></td>
+                    <td><code>10.1.1.10</code></td>
+                    <td><code>255.255.255.0</code></td>
+                    <td><code>10.1.1.1</code></td>
+                    <td>Ethernet (MAC: 5000.0001.0001)</td>
+                </tr>
+                <tr>
+                    <td><strong>R1</strong></td>
+                    <td><code>GigabitEthernet0/1</code></td>
+                    <td><code>10.1.1.1</code></td>
+                    <td><code>255.255.255.0</code></td>
+                    <td>N/A</td>
+                    <td>Ethernet (MAC: 0000.5E00.0101)</td>
+                </tr>
+                <tr>
+                    <td><strong>R1</strong></td>
+                    <td><code>GigabitEthernet0/0</code></td>
+                    <td><code>10.1.12.1</code></td>
+                    <td><code>255.255.255.252</code></td>
+                    <td>N/A</td>
+                    <td>Point-to-Point WAN Link</td>
+                </tr>
+                <tr>
+                    <td><strong>R2</strong></td>
+                    <td><code>GigabitEthernet0/0</code></td>
+                    <td><code>10.1.12.2</code></td>
+                    <td><code>255.255.255.252</code></td>
+                    <td>N/A</td>
+                    <td>Point-to-Point WAN Link</td>
+                </tr>
+                <tr>
+                    <td><strong>R2</strong></td>
+                    <td><code>GigabitEthernet0/1</code></td>
+                    <td><code>10.1.2.1</code></td>
+                    <td><code>255.255.255.0</code></td>
+                    <td>N/A</td>
+                    <td>Ethernet (MAC: 0000.5E00.0201)</td>
+                </tr>
+                <tr>
+                    <td><strong>PC2</strong></td>
+                    <td><code>eth0</code></td>
+                    <td><code>10.1.2.20</code></td>
+                    <td><code>255.255.255.0</code></td>
+                    <td><code>10.1.2.1</code></td>
+                    <td>Ethernet (MAC: 5000.0002.0002)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Initial Device State -->
+        <div class="baseline-box">
+            <strong>Initial Baseline State:</strong> Routers R1 and R2 have default factory configurations with all interfaces shutdown. PC1 and PC2 have IP addresses configured on their local interfaces.
+        </div>
+    </div>
+
+    <!-- 3. ENGINEERING REQUIREMENTS SPECIFICATION -->
+    <div class="card">
+        <h2>📋 Engineering Requirements</h2>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">
+            Configure the routers and trace multi-hop packet delivery and framing transformations.
+        </p>
+
+        <div class="req-group">
+            <h3>1. Router Hostnames & Usability:</h3>
+            <ul class="clean-list">
+                <li>Configure device hostname <strong>R1</strong> on Router 1 and <strong>R2</strong> on Router 2.</li>
+                <li>On both routers, configure console line 0 with <code>logging synchronous</code> and <code>exec-timeout 0 0</code>.</li>
+            </ul>
+        </div>
+
+        <div class="req-group">
+            <h3>2. Interface Addressing & Physical Enablement:</h3>
+            <ul class="clean-list">
+                <li>On <strong>R1</strong>, configure IPv4 addresses and descriptions on <code>GigabitEthernet0/1</code> (Site A LAN) and <code>GigabitEthernet0/0</code> (WAN to R2). Enable both interfaces and bring the interface up.</li>
+                <li>On <strong>R2</strong>, configure IPv4 addresses and descriptions on <code>GigabitEthernet0/1</code> (Site B LAN) and <code>GigabitEthernet0/0</code> (WAN to R1). Enable both interfaces and bring the interface up.</li>
+            </ul>
+        </div>
+
+        <div class="req-group">
+            <h3>3. IPv4 Static Routing Across the WAN:</h3>
+            <ul class="clean-list">
+                <li>On <strong>R1</strong>, configure an IPv4 static route to reach Site B LAN (<code>10.1.2.0/24</code>) via R2's WAN IP (<code>10.1.12.2</code>).</li>
+                <li>On <strong>R2</strong>, configure an IPv4 static route to reach Site A LAN (<code>10.1.1.0/24</code>) via R1's WAN IP (<code>10.1.12.1</code>).</li>
+            </ul>
+        </div>
+
+        <div class="req-group">
+            <h3>4. End-to-End Tracing & Header Transformation:</h3>
+            <ul class="clean-list">
+                <li>Initiate an ICMP ping from <strong>PC1</strong> to <strong>PC2</strong> (<code>10.1.2.20</code>) and verify 100% bidirectional reachability.</li>
+                <li>Execute a <code>traceroute</code> from PC1 to PC2 and record each intermediate router hop and TTL decrement.</li>
+                <li>Analyze how Layer 2 encapsulation changes across the 3 segments (LAN 1 &rarr; WAN Link &rarr; LAN 2) while Layer 3 Source IP (<code>10.1.1.10</code>) and Destination IP (<code>10.1.2.20</code>) remain invariant.</li>
+            </ul>
+        </div>
+
+        <div class="req-group">
+            <h3>5. Configuration Persistence:</h3>
+            <ul class="clean-list">
+                <li>Save the active running configuration to NVRAM on both routers.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 4. VERIFICATION & VALIDATION -->
+    <div class="card">
+        <h2>🔍 Verification & Validation Steps</h2>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">
+            Run these verification commands on the routers and hosts to validate routing paths and TTL behavior.
+        </p>
+
+        <!-- Step 1 -->
+        <div class="verif-step">
+            <div class="verif-title">
+                <span>1. Verify Multi-Hop Routing Tables</span>
+            </div>
+            <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 6px;">Check R1 routing table to confirm the static route to Site B LAN:</p>
+            <div class="code-block">
+                <pre><code>R1# show ip route static
+S        10.1.2.0/24 [1/0] via 10.1.12.2</code></pre>
+            </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="verif-step">
+            <div class="verif-title">
+                <span>2. Multi-Hop Traceroute from PC1</span>
+            </div>
+            <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 6px;">Execute traceroute to verify the 2 router hops:</p>
+            <div class="code-block">
+                <pre><code>PC1:~$ traceroute -n 10.1.2.20
+traceroute to 10.1.2.20 (10.1.2.20), 30 hops max, 46 byte packets
+ 1  10.1.1.1   0.621 ms  0.412 ms  0.395 ms  (R1 Gateway)
+ 2  10.1.12.2  1.124 ms  0.985 ms  0.920 ms  (R2 WAN Hop)
+ 3  10.1.2.20  1.512 ms  1.420 ms  1.380 ms  (PC2 Destination)</code></pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. COMPLETED CONFIGURATIONS & LAB COMMENTARY (SPOILER-FREE DRAWER) -->
+    <details class="card solution-drawer">
+        <summary>
+            <span>✅ Completed Configurations & Engineering Deep-Dive & Exam Pitfalls</span>
+            <span class="solution-badge">Click to Reveal</span>
+        </summary>
+        <div class="solution-content" style="margin-top: 18px;">
+            <p style="color: var(--text-muted); font-size: 0.9rem;">
+                Review router configurations, the 3-hop header transformation map, and in-depth lab commentary.
+            </p>
+
+            <!-- Tab Controls -->
+            <div class="tabs-header">
+                <button class="tab-btn active" onclick="showTab('tab-r1', this)">Router 1 (R1)</button>
+                <button class="tab-btn" onclick="showTab('tab-r2', this)">Router 2 (R2)</button>
+                <button class="tab-btn" onclick="showTab('tab-transform', this)">🔬 3-Segment Header Transformation</button>
+                <button class="tab-btn" onclick="showTab('tab-commentary', this)">🎓 Engineering Deep-Dive & Exam Pitfalls</button>
+            </div>
+
+            <!-- Tab 1: R1 -->
+            <div class="tab-pane active" id="tab-r1">
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy R1 Config</button>
+                    <pre><code>enable
+configure terminal
+!
+hostname R1
+!
+line con 0
+ logging synchronous
+ exec-timeout 0 0
+!
+interface GigabitEthernet0/1
+ description Site A LAN Gateway
+ ip address 10.1.1.1 255.255.255.0
+ no shutdown
+!
+interface GigabitEthernet0/0
+ description Point-to-Point WAN to R2
+ ip address 10.1.12.1 255.255.255.252
+ no shutdown
+!
+ip route 10.1.2.0 255.255.255.0 10.1.12.2
+!
+end
+write memory</code></pre>
+                </div>
+            </div>
+
+            <!-- Tab 2: R2 -->
+            <div class="tab-pane" id="tab-r2">
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy R2 Config</button>
+                    <pre><code>enable
+configure terminal
+!
+hostname R2
+!
+line con 0
+ logging synchronous
+ exec-timeout 0 0
+!
+interface GigabitEthernet0/0
+ description Point-to-Point WAN to R1
+ ip address 10.1.12.2 255.255.255.252
+ no shutdown
+!
+interface GigabitEthernet0/1
+ description Site B LAN Gateway
+ ip address 10.1.2.1 255.255.255.0
+ no shutdown
+!
+ip route 10.1.1.0 255.255.255.0 10.1.12.1
+!
+end
+write memory</code></pre>
+                </div>
+            </div>
+
+            <!-- Tab 3: Header Transformation -->
+            <div class="tab-pane" id="tab-transform">
+                <h4>🔬 Hop-by-Hop Header Transformation Across 3 Links</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Link / Segment</th>
+                            <th>Layer 2 Framing</th>
+                            <th>Layer 2 Source / Dest</th>
+                            <th>Layer 3 Source IP</th>
+                            <th>Layer 3 Dest IP</th>
+                            <th>TTL</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Segment 1: PC1 &rarr; R1</strong> (LAN 1)</td>
+                            <td>Ethernet II</td>
+                            <td>Src: <code>PC1 MAC</code> | Dst: <code>R1 Gi0/1 MAC</code></td>
+                            <td><code>10.1.1.10</code></td>
+                            <td><code>10.1.2.20</code></td>
+                            <td>64</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Segment 2: R1 &rarr; R2</strong> (WAN Link)</td>
+                            <td>Point-to-Point / HDLC / Ethernet</td>
+                            <td>Src: <code>R1 Gi0/0</code> | Dst: <code>R2 Gi0/0</code></td>
+                            <td><code>10.1.1.10</code> (Unchanged)</td>
+                            <td><code>10.1.2.20</code> (Unchanged)</td>
+                            <td>63 (-1)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Segment 3: R2 &rarr; PC2</strong> (LAN 2)</td>
+                            <td>Ethernet II</td>
+                            <td>Src: <code>R2 Gi0/1 MAC</code> | Dst: <code>PC2 MAC</code></td>
+                            <td><code>10.1.1.10</code> (Unchanged)</td>
+                            <td><code>10.1.2.20</code> (Unchanged)</td>
+                            <td>62 (-1)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Tab 4: Commentary -->
+            <div class="tab-pane" id="tab-commentary">
+                <div class="commentary-section">
+                    <h4>🔬 Architectural Breakdown & Design Logic</h4>
+                    <p>
+                        This lab reinforces core Volume 1 Chapter 3 WAN concepts: how routers interconnect disparate Layer 2 data links and provide end-to-end routing.
+                    </p>
+                </div>
+
+                <div class="commentary-section">
+                    <h4>1. Why Layer 2 Headers Are Stripped at Every Router</h4>
+                    <p>
+                        A Layer 2 Ethernet frame exists solely to deliver a payload across a single local physical medium (collision domain / broadcast domain). When a frame arrives at a router:
+                    </p>
+                    <ul>
+                        <li>The router strips and discards the Layer 2 header because that header has completed its job of getting the packet across the first link.</li>
+                        <li>The router inspects the Layer 3 IP packet to determine the next hop.</li>
+                        <li>It builds a completely new Layer 2 header tailored to the outgoing physical media (e.g. Ethernet, Serial HDLC, or Frame Relay) before transmission.</li>
+                    </ul>
+                </div>
+
+                <div class="commentary-section">
+                    <h4>2. The Golden Rule of IP Header Invariance</h4>
+                    <p>
+                        Notice that throughout the entire journey across multiple routers, the <strong>Source IP (`10.1.1.10`)</strong> and <strong>Destination IP (`10.1.2.20`)</strong> never change (unless Network Address Translation / NAT is performed).
+                    </p>
+                    <p>
+                        The only IP header fields that change are:
+                    </p>
+                    <ul>
+                        <li><strong>TTL (Time-to-Live)</strong>: Decremented by 1 at each router.</li>
+                        <li><strong>Header Checksum</strong>: Recalculated at each router due to the modified TTL.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </details>
+
+</div>
+
+<script>
+    // 1-Click Copy Function
+    function copyCode(btn) {
+        const pre = btn.nextElementSibling;
+        navigator.clipboard.writeText(pre.innerText).then(() => {
+            const originalText = btn.innerText;
+            btn.innerText = "Copied!";
+            btn.style.background = "#10b981";
+            btn.style.borderColor = "#10b981";
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.style.background = "#223049";
+                btn.style.borderColor = "#334155";
+            }, 2000);
+        });
+    }
+
+    // Solution Tabs Switcher
+    function showTab(tabId, btn) {
+        document.querySelectorAll(".tab-pane").forEach(pane => pane.classList.remove("active"));
+        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+        document.getElementById(tabId).classList.add("active");
+        btn.classList.add("active");
+    }
+</script>
+
+</body>
+</html>

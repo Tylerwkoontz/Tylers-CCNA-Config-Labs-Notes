@@ -1,0 +1,47 @@
+{
+  "lab01": {
+    "title": "CCNA Lab 01: TCP/IP Encapsulation & Headers",
+    "cml_id": "7361449c-6ad1-4818-bd88-a60a49d8994b",
+    "file": "lab01-tcp-ip-encapsulation.yaml"
+  },
+  "lab03": {
+    "title": "CCNA Lab 03: Packet Delivery & ARP Resolution",
+    "cml_id": "870003f1-0d0e-4666-bc71-9ba04d3cdc01",
+    "file": "lab03-packet-delivery-arp.yaml"
+  },
+  "lab03b": {
+    "title": "CCNA Lab 03B: Multi-Hop Routed WAN & Framing",
+    "cml_id": "916bf522-0b3c-4b84-9518-186538a18d07",
+    "file": "lab03b-routed-wan-headers.yaml"
+  },
+  "lab04": {
+    "title": "CCNA Lab 04: Cisco IOS CLI & Memory Management",
+    "cml_id": "92ffc4bc-99a3-4903-9b6a-c548fc385445",
+    "file": "lab04-cli-navigation-memory.yaml"
+  },
+  "lab06": {
+    "title": "CCNA Lab 06: Switch Management & Hardened SSH",
+    "cml_id": "98a5a03b-fe9e-4f57-bbed-f1f88894cab8",
+    "file": "lab06-switch-management-ssh.yaml"
+  },
+  "lab06b": {
+    "title": "CCNA Lab 06B: Cross-Subnet Remote Switch Management",
+    "cml_id": "95490e0c-179e-43b9-8329-81155c7d077a",
+    "file": "lab06b-cross-subnet-management.yaml"
+  },
+  "lab07": {
+    "title": "CCNA Lab 07: Switch Interfaces & MAC Table",
+    "cml_id": "22f10e7e-ca9e-4a8f-831f-b5c29075902f",
+    "file": "lab07-switch-interfaces-mac-table.yaml"
+  },
+  "lab07b": {
+    "title": "CCNA Lab 07B: Interface Diagnostics & Duplex Mismatches",
+    "cml_id": "0fd294a1-3799-4580-899e-95821c17b581",
+    "file": "lab07b-interface-diagnostics-duplex.yaml"
+  },
+  "lab17": {
+    "title": "CCNA Lab 17: Multi-Subnet IPv4 Routing",
+    "cml_id": "e7e2a09f-3364-4c45-a401-acf83cdd610e",
+    "file": "lab17-multi-subnet-routing.yaml"
+  }
+}

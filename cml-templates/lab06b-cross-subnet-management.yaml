@@ -1,0 +1,111 @@
+lab:
+  title: 'CCNA Lab 06B: Cross-Subnet Remote Switch Management'
+  description: 'Vol 1 Ch 6: `ip default-gateway` Verification (Hierarchical Layout)'
+  notes: "# CCNA Exam Lab: Cross-Subnet Remote Switch Management\n**Exam Blueprint**:\
+    \ CCNA 200-301 v1.1 Domains 1.1, 2.1 & 5.5\n**Focus**: Cisco Press OCG Vol 1,\
+    \ Chapter 6\n\n---\n## \U0001F3E2 Scenario & Network Topology\nNetwork operations\
+    \ engineers located on the NOC Subnet (`10.1.1.0/24`) report they cannot reach\
+    \ switch `SW1` (`192.168.1.2`) across router `R1`. You must diagnose the Layer\
+    \ 2 switch routing behavior and restore secure cross-subnet administration.\n\n\
+    ### Addressing Table\n| Device | Interface | IPv4 Address | Subnet Mask | Default\
+    \ Gateway | Role |\n| :--- | :--- | :--- | :--- | :--- | :--- |\n| **Admin-NOC**\
+    \ | `eth0` | `10.1.1.50` | `255.255.255.0` | `10.1.1.1` | NOC Management Station\
+    \ |\n| **R1** | `Gi0/1` | `10.1.1.1` | `255.255.255.0` | N/A | NOC Subnet Gateway\
+    \ |\n| **R1** | `Gi0/2` | `192.168.1.1` | `255.255.255.0` | N/A | Campus Switch\
+    \ Subnet Gateway |\n| **SW1** | `Vlan 1` | `192.168.1.2` | `255.255.255.0` | *TO\
+    \ CONFIGURE* | Managed Access Switch |\n\n---\n## \U0001F4CB Exam Tasks & Technical\
+    \ Requirements\n1. **Fault Isolation**:\n   - Attempt to ping `192.168.1.2` from\
+    \ `Admin-NOC`.\n   - Explain why the Layer 2 switch fails to respond to packets\
+    \ arriving from an off-subnet host even when its SVI is `up/up`.\n2. **Default\
+    \ Gateway Implementation**:\n   - Configure the required default gateway command\
+    \ on `SW1` so return packets are directed to router `R1`.\n3. **Cross-Subnet Administration\
+    \ Verification**:\n   - Test ICMP reachability from `Admin-NOC` to `SW1`.\n  \
+    \ - Establish an SSH administrative session from `Admin-NOC` to `192.168.1.2`\
+    \ using credentials `admin` / `AdminSSH#2026`.\n4. **Configuration Persistence**:\n\
+    \   - Save the running configuration to NVRAM.\n\n---\n## \U0001F50D Success &\
+    \ Verification Criteria\n- Ping from `Admin-NOC` (`10.1.1.50`) to `SW1` (`192.168.1.2`)\
+    \ achieves a 100% success rate.\n- Cross-subnet SSH session from `Admin-NOC` connects\
+    \ successfully.\n- `show running-config | include default-gateway` confirms the\
+    \ gateway setting.\n- *Need a hint? Check the interactive workbook in `~/ccna-study/labs/lab06b-cross-subnet-management.html`.*"
+  version: 0.3.1
+  node_staging:
+    enabled: false
+    start_remaining: true
+    abort_on_failure: false
+nodes:
+- id: n0
+  label: R1
+  node_definition: iosv
+  x: 0
+  y: -120
+  interfaces:
+  - id: i0
+    label: Loopback0
+    type: loopback
+  - id: i1
+    label: GigabitEthernet0/0
+    type: physical
+    slot: 0
+  - id: i2
+    label: GigabitEthernet0/1
+    type: physical
+    slot: 1
+  - id: i3
+    label: GigabitEthernet0/2
+    type: physical
+    slot: 2
+  configuration:
+  - name: ios_config.txt
+    content: "hostname R1\ninterface GigabitEthernet0/1\n description Gateway to NOC\
+      \ Subnet\n ip address 10.1.1.1 255.255.255.0\n no shutdown\n!\ninterface GigabitEthernet0/2\n\
+      \ description Gateway to Campus Switch Subnet\n ip address 192.168.1.1 255.255.255.0\n\
+      \ no shutdown\n!\nline con 0\n logging synchronous\n exec-timeout 0 0\nend\n"
+- id: n1
+  label: Admin-NOC
+  node_definition: alpine
+  x: -220
+  y: 120
+  interfaces:
+  - id: i0
+    label: eth0
+    type: physical
+    slot: 0
+- id: n2
+  label: SW1
+  node_definition: iosvl2
+  x: 220
+  y: 120
+  interfaces:
+  - id: i0
+    label: Loopback0
+    type: loopback
+  - id: i1
+    label: GigabitEthernet0/0
+    type: physical
+    slot: 0
+  - id: i2
+    label: GigabitEthernet0/1
+    type: physical
+    slot: 1
+  configuration:
+  - name: ios_config.txt
+    content: "hostname SW1\nenable secret cisco123\ninterface Vlan1\n ip address 192.168.1.2\
+      \ 255.255.255.0\n no shutdown\n!\nip domain-name certskills.internal\ncrypto\
+      \ key generate rsa modulus 2048\nip ssh version 2\nusername admin secret AdminSSH#2026\n\
+      line vty 0 15\n login local\n transport input ssh\nline con 0\n logging synchronous\n\
+      \ exec-timeout 0 0\nend\n"
+links:
+- id: l0
+  n1: n1
+  n2: n0
+  i1: i0
+  i2: i2
+  label: Admin-NOC-eth0<->R1-Gi0/1
+- id: l1
+  n1: n0
+  n2: n2
+  i1: i3
+  i2: i2
+  label: R1-Gi0/2<->SW1-Gi0/1
+annotations: []
+smart_annotations: []

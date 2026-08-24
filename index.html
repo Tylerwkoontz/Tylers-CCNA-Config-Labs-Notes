@@ -9,6 +9,7 @@
             --bg-body: #0b0f19;
             --bg-card: #151e2e;
             --bg-inner: #0f172a;
+            --bg-code: #070a12;
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --accent-blue: #0284c7;
@@ -31,17 +32,17 @@
         }
 
         .container {
-            max-width: 1040px;
+            max-width: 1080px;
             margin: 0 auto;
         }
 
-        /* Hero */
+        /* Hero Header */
         .hero {
             background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
             border: 1px solid var(--border-color);
             border-radius: 16px;
             padding: 28px 32px;
-            margin-bottom: 28px;
+            margin-bottom: 24px;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
             display: flex;
             justify-content: space-between;
@@ -51,8 +52,8 @@
         }
 
         .hero h1 {
-            margin: 0 0 6px 0;
-            font-size: 2rem;
+            margin: 0 0 8px 0;
+            font-size: 1.95rem;
             color: #ffffff;
             letter-spacing: -0.5px;
         }
@@ -60,40 +61,80 @@
         .hero p {
             margin: 0;
             color: var(--text-muted);
-            font-size: 1rem;
+            font-size: 0.98rem;
+        }
+
+        .hero-badges {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
         }
 
         .hero-badge {
-            background: #0369a1;
-            color: #e0f2fe;
-            padding: 6px 14px;
+            padding: 4px 12px;
             border-radius: 9999px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
+        .badge-cyan   { background: #0369a1; color: #e0f2fe; }
+        .badge-green  { background: #064e3b; color: #a7f3d0; }
+        .badge-purple { background: #581c87; color: #f3e8ff; }
+        .badge-amber  { background: #78350f; color: #fef3c7; }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .stat-icon { font-size: 1.8rem; }
+
+        .stat-val {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #ffffff;
+            line-height: 1.2;
+        }
+
+        .stat-label {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
         h2 {
-            font-size: 1.35rem;
+            font-size: 1.3rem;
             color: var(--accent-cyan);
-            margin: 32px 0 16px 0;
+            margin: 28px 0 14px 0;
             display: flex;
             align-items: center;
             gap: 8px;
-        }
-
-        .grid-2 {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 20px;
         }
 
         .card {
             background-color: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: 12px;
-            padding: 20px;
+            padding: 22px;
+            margin-bottom: 20px;
             transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
         }
 
@@ -106,11 +147,11 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
         .card-title {
-            font-size: 1.15rem;
+            font-size: 1.12rem;
             font-weight: 700;
             color: #ffffff;
             margin: 0;
@@ -118,8 +159,9 @@
 
         .card-desc {
             color: var(--text-muted);
-            font-size: 0.9rem;
+            font-size: 0.88rem;
             margin: 0 0 16px 0;
+            line-height: 1.5;
         }
 
         .tag {
@@ -133,14 +175,15 @@
         .tag-cml { background: #581c87; color: #f3e8ff; }
         .tag-active { background: #064e3b; color: #a7f3d0; }
 
+        /* Buttons */
         .btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            padding: 9px 16px;
+            padding: 8px 14px;
             border-radius: 8px;
-            font-size: 0.9rem;
+            font-size: 0.86rem;
             font-weight: 600;
             text-decoration: none;
             cursor: pointer;
@@ -154,6 +197,57 @@
         .btn-secondary:hover { background-color: #475569; }
         .btn-green { background-color: #059669; color: #ffffff; }
         .btn-green:hover { background-color: #047857; }
+        .btn-cml { background-color: #581c87; color: #f3e8ff; border: 1px solid #7e22ce; }
+        .btn-cml:hover { background-color: #6b21a8; }
+
+        /* Filter Chips */
+        .filter-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .filter-chip {
+            background: var(--bg-inner);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 7px 16px;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-chip:hover { color: #ffffff; border-color: var(--accent-cyan); }
+        .filter-chip.active {
+            background: var(--accent-blue);
+            color: #ffffff;
+            border-color: var(--accent-blue);
+        }
+
+        /* Part Section Headers */
+        .part-section-title {
+            font-size: 1.1rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--accent-amber);
+            margin: 28px 0 14px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 18px;
+            margin-bottom: 20px;
+        }
 
         .workflow-step {
             background: var(--bg-inner);
@@ -166,14 +260,14 @@
         .step-num {
             font-weight: 800;
             color: var(--accent-cyan);
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             text-transform: uppercase;
         }
 
         .step-title {
             font-weight: 700;
             color: #ffffff;
-            font-size: 1rem;
+            font-size: 0.98rem;
             margin: 2px 0 6px 0;
         }
 
@@ -197,9 +291,34 @@
             margin-top: 14px;
         }
 
+        .trainer-mode-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .mode-btn {
+            background: #070a12;
+            border: 1px solid #334155;
+            color: var(--text-muted);
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .mode-btn.active {
+            background: #1e293b;
+            color: var(--accent-cyan);
+            border-color: var(--accent-cyan);
+        }
+
         .trainer-target {
             font-family: var(--font-mono);
-            font-size: 1.4rem;
+            font-size: 1.5rem;
             font-weight: 800;
             color: var(--accent-amber);
             margin: 10px 0;
@@ -216,7 +335,7 @@
             background: #070a12;
             border: 1px solid #334155;
             color: #ffffff;
-            padding: 8px 12px;
+            padding: 9px 14px;
             border-radius: 6px;
             font-family: var(--font-mono);
             font-size: 0.9rem;
@@ -225,9 +344,20 @@
         }
 
         .trainer-result {
-            margin-top: 10px;
+            margin-top: 12px;
             font-weight: 700;
-            font-size: 0.95rem;
+            font-size: 0.92rem;
+            line-height: 1.5;
+        }
+
+        .score-pill {
+            background: #070a12;
+            border: 1px solid #334155;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--accent-green);
         }
 
         pre {
@@ -242,7 +372,27 @@
             margin: 8px 0;
         }
 
-        /* Accordions */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+            font-size: 0.88rem;
+        }
+
+        th, td {
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--bg-inner);
+            color: var(--accent-cyan);
+            font-weight: 700;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+        }
+
         details {
             background: var(--bg-inner);
             border: 1px solid var(--border-color);
@@ -260,177 +410,589 @@
         }
 
         details[open] summary { border-bottom: 1px solid var(--border-color); }
-        .drawer-content { padding: 14px 16px; }
+        .drawer-content { padding: 14px 18px; }
     </style>
 </head>
 <body>
 
 <div class="container">
 
-    <!-- Hero Header -->
+    <!-- 1. HERO HEADER -->
     <div class="hero">
         <div>
-            <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
-                <span class="hero-badge">Pure HTML Hub</span>
-                <span class="hero-badge" style="background: #064e3b; color: #a7f3d0;">Zero Fluff • Offline</span>
+            <div class="hero-badges">
+                <span class="hero-badge badge-cyan">CCNA 200-301 v1.1</span>
+                <span class="hero-badge badge-green">Exam Performance Labs</span>
+                <span class="hero-badge badge-purple">9 CML Topologies Live</span>
             </div>
-            <h1>Tyler's CCNA Lab Hub & Study Dashboard</h1>
-            <p>Direct access to interactive lab workbooks, mental speed trainers, and CML lab automation.</p>
+            <h1>Tyler's CCNA Lab Hub & Command Center</h1>
+            <p>Direct access to 9 interactive CertSkills workbooks, mental speed drills, and CML automation.</p>
         </div>
-        <div>
-            <a href="labs/lab09-multi-subnet-routing.html" class="btn btn-primary" style="font-size: 1rem; padding: 12px 20px;">
-                🚀 Open Active Lab 09
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <a href="labs/lab06-switch-management-ssh.html" class="btn btn-primary">
+                🚀 Active Lab 06 (SSH)
+            </a>
+            <a href="labs/lab07-switch-interfaces-mac-table.html" class="btn btn-secondary">
+                ⚡ Active Lab 07 (MAC Table)
             </a>
         </div>
     </div>
 
-    <!-- Active Study Focus -->
+    <!-- 2. READINESS METRICS BAR -->
+    <div class="stats-bar">
+        <div class="stat-card">
+            <div class="stat-icon">🧪</div>
+            <div>
+                <div class="stat-val">9 Labs Ready</div>
+                <div class="stat-label">Workbooks Available</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">📖</div>
+            <div>
+                <div class="stat-val">Part II Active</div>
+                <div class="stat-label">Chapters 4–7 Focus</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">🎯</div>
+            <div>
+                <div class="stat-val">Exam Sim Mode</div>
+                <div class="stat-label">Zero Spoilers in CML</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">🏛️</div>
+            <div>
+                <div class="stat-val">100% CertSkills</div>
+                <div class="stat-label">Cisco Press Format</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. ACTIVE FOCUS HIGHLIGHT -->
     <h2>🎯 Active Chapter Focus</h2>
     <div class="card" style="border-left: 5px solid #10b981; background: linear-gradient(to right, #13232c, #151e2e);">
         <div class="card-header">
             <div>
-                <h3 class="card-title" style="font-size: 1.3rem;">Volume 1, Chapter 9: Subnet Design & IPv4 Routing</h3>
+                <h3 class="card-title" style="font-size: 1.25rem;">Volume 1, Part II: Implementing Ethernet LANs (Chapters 4–7)</h3>
                 <p class="card-desc" style="margin-top: 4px;">
-                    Mastering VLSM formulas, the Magic Number method ($256 - \text{mask}$), Cisco IOS interface configuration, and static routing logic.
+                    Mastering Cisco Catalyst switch management, SVI VLAN 1 addressing, default gateway, hardened SSH v2, speed/duplex autonegotiation, and MAC address table forwarding logic.
                 </p>
             </div>
             <span class="tag tag-active">In Progress</span>
         </div>
-        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-            <a href="labs/lab09-multi-subnet-routing.html" class="btn btn-primary">
-                📄 Open Lab 09 Workbook
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <a href="labs/lab06-switch-management-ssh.html" class="btn btn-primary">
+                📄 Lab 06 (SSH & SVI)
+            </a>
+            <a href="labs/lab06b-cross-subnet-management.html" class="btn btn-green">
+                📄 Lab 06B (Default Gateway)
+            </a>
+            <a href="labs/lab07-switch-interfaces-mac-table.html" class="btn btn-secondary">
+                📄 Lab 07 (MAC Table)
+            </a>
+            <a href="labs/lab07b-interface-diagnostics-duplex.html" class="btn btn-secondary">
+                📄 Lab 07B (Duplex Diagnostics)
             </a>
         </div>
+    </div>
 
-        <details style="margin-top: 16px;">
-            <summary>📖 Quick Chapter 09 Formulas & Gotchas (Click to Expand)</summary>
-            <div class="drawer-content" style="font-size: 0.9rem;">
-                <ul>
-                    <li><strong>Number of Subnets ($s$ borrowed bits)</strong>: $2^s$</li>
-                    <li><strong>Usable Hosts per Subnet ($h$ host bits)</strong>: $2^h - 2$</li>
-                    <li><strong>Magic Number (Step Size)</strong>: $256 - \text{Interesting Octet Mask Value}$</li>
-                    <li><strong>IOS 15+ Route Types</strong>: <code>C</code> = Connected Subnet (e.g. <code>10.1.1.0/24</code>), <code>L</code> = Local Host Route for Interface IP (e.g. <code>10.1.1.1/32</code>).</li>
-                </ul>
+    <!-- 4. INTERACTIVE LAB CATALOG WITH FILTER CHIPS -->
+    <h2>🧪 Interactive Lab Catalog</h2>
+    
+    <!-- Filter Chips -->
+    <div class="filter-group">
+        <button class="filter-chip active" onclick="filterLabs('all', this)">All Labs (9)</button>
+        <button class="filter-chip" onclick="filterLabs('part1', this)">Part I: Networking Intro (3)</button>
+        <button class="filter-chip" onclick="filterLabs('part2', this)">Part II: Ethernet LANs (5)</button>
+        <button class="filter-chip" onclick="filterLabs('part5', this)">Part V: IPv4 Routing (1)</button>
+    </div>
+
+    <!-- PART I SECTION -->
+    <div class="lab-section" id="section-part1">
+        <div class="part-section-title">📁 Part I: Introduction to Networking (Chapters 1–3)</div>
+        <div class="grid-2">
+            <!-- Lab 01 Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h3 class="card-title">Lab 01: TCP/IP Encapsulation & Headers</h3>
+                        <p style="font-size: 0.8rem; color: #38bdf8; margin: 2px 0;">CCNA 1.1 & 1.4 • Part I (Ch 1 & 2)</p>
+                    </div>
+                    <span class="tag tag-cml">CML: 7361449c</span>
+                </div>
+                <p class="card-desc">
+                    Deconstruct 5-layer encapsulation, trace TCP 3-way handshake (SYN, SYN-ACK, ACK), inspect IPv4 headers, and analyze Ethernet II frames.
+                </p>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <a href="labs/lab01-tcp-ip-encapsulation.html" class="btn btn-primary">
+                        Open Workbook
+                    </a>
+                    <button class="btn btn-cml" onclick="copyCmlCommand('7361449c-6ad1-4818-bd88-a60a49d8994b', this)">
+                        ⚡ Copy CML Start
+                    </button>
+                </div>
+            </div>
+
+            <!-- Lab 03 Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h3 class="card-title">Lab 03: Packet Delivery & ARP Resolution</h3>
+                        <p style="font-size: 0.8rem; color: #38bdf8; margin: 2px 0;">CCNA 1.1, 1.3 & 3.1 • Part I (Ch 3)</p>
+                    </div>
+                    <span class="tag tag-cml">CML: 870003f1</span>
+                </div>
+                <p class="card-desc">
+                    Analyze local vs. remote host subnet routing logic, trace Layer 2 ARP broadcast/reply mechanics, and observe hop-by-hop MAC address rewrites across a router.
+                </p>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <a href="labs/lab03-packet-delivery-arp.html" class="btn btn-primary">
+                        Open Workbook
+                    </a>
+                    <button class="btn btn-cml" onclick="copyCmlCommand('870003f1-0d0e-4666-bc71-9ba04d3cdc01', this)">
+                        ⚡ Copy CML Start
+                    </button>
+                </div>
+            </div>
+
+            <!-- Lab 03B Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h3 class="card-title">Lab 03B: Multi-Hop WAN & Header Transform</h3>
+                        <p style="font-size: 0.8rem; color: #38bdf8; margin: 2px 0;">CCNA 1.1, 1.2 & 3.1 • Part I (Ch 3)</p>
+                    </div>
+                    <span class="tag tag-cml">CML: 916bf522</span>
+                </div>
+                <p class="card-desc">
+                    Contrast Ethernet LAN vs Point-to-Point WAN framing, trace multi-hop static routes across dual routers, and prove IP address invariance.
+                </p>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <a href="labs/lab03b-routed-wan-headers.html" class="btn btn-primary">
+                        Open Workbook
+                    </a>
+                    <button class="btn btn-cml" onclick="copyCmlCommand('916bf522-0b3c-4b84-9518-186538a18d07', this)">
+                        ⚡ Copy CML Start
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PART II SECTION -->
+    <div class="lab-section" id="section-part2">
+        <div class="part-section-title">📁 Part II: Implementing Ethernet LANs (Chapters 4–7)</div>
+        <div class="grid-2">
+            <!-- Lab 04 Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h3 class="card-title">Lab 04: Cisco IOS CLI & Memory Management</h3>
+                        <p style="font-size: 0.8rem; color: #38bdf8; margin: 2px 0;">CCNA 2.8 • Part II (Ch 4)</p>
+                    </div>
+                    <span class="tag tag-cml">CML: 92ffc4bc</span>
+                </div>
+                <p class="card-desc">
+                    Master User/Privileged EXEC modes, configuration submodes, CLI shortcuts (Tab, ?), command history recall, `do` prefix, and RAM/NVRAM memory types.
+                </p>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <a href="labs/lab04-cli-navigation-memory.html" class="btn btn-primary">
+                        Open Workbook
+                    </a>
+                    <button class="btn btn-cml" onclick="copyCmlCommand('92ffc4bc-99a3-4903-9b6a-c548fc385445', this)">
+                        ⚡ Copy CML Start
+                    </button>
+                </div>
+            </div>
+
+            <!-- Lab 06 Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h3 class="card-title">Lab 06: Switch Management & Hardened SSH</h3>
+                        <p style="font-size: 0.8rem; color: #38bdf8; margin: 2px 0;">CCNA 1.1, 2.1 & 5.5 • Part II (Ch 4 & 6)</p>
+                    </div>
+                    <span class="tag tag-cml">CML: 98a5a03b</span>
+                </div>
+                <p class="card-desc">
+                    Configure Catalyst switch control plane security, SVI VLAN 1 management IP, default gateway, and hardened SSH v2 with VTY transport restrictions.
+                </p>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <a href="labs/lab06-switch-management-ssh.html" class="btn btn-primary">
+                        Open Workbook
+                    </a>
+                    <button class="btn btn-cml" onclick="copyCmlCommand('98a5a03b-fe9e-4f57-bbed-f1f88894cab8', this)">
+                        ⚡ Copy CML Start
+                    </button>
+                </div>
+            </div>
+
+            <!-- Lab 06B Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h3 class="card-title">Lab 06B: Cross-Subnet Switch Management</h3>
+                        <p style="font-size: 0.8rem; color: #38bdf8; margin: 2px 0;">CCNA 1.1, 2.1 & 5.5 • Part II (Ch 6)</p>
+                    </div>
+                    <span class="tag tag-cml">CML: 95490e0c</span>
+                </div>
+                <p class="card-desc">
+                    Diagnose remote management failure when `ip default-gateway` is omitted on a Layer 2 switch, and configure cross-subnet SSH reachability.
+                </p>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <a href="labs/lab06b-cross-subnet-management.html" class="btn btn-primary">
+                        Open Workbook
+                    </a>
+                    <button class="btn btn-cml" onclick="copyCmlCommand('95490e0c-179e-43b9-8329-81155c7d077a', this)">
+                        ⚡ Copy CML Start
+                    </button>
+                </div>
+            </div>
+
+            <!-- Lab 07 Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h3 class="card-title">Lab 07: Switch Interfaces & MAC Table</h3>
+                        <p style="font-size: 0.8rem; color: #38bdf8; margin: 2px 0;">CCNA 1.1, 2.1 & 2.4 • Part II (Ch 5 & 7)</p>
+                    </div>
+                    <span class="tag tag-cml">CML: 22f10e7e</span>
+                </div>
+                <p class="card-desc">
+                    Configure interface descriptions, lock speed/duplex on inter-switch links, analyze dynamic MAC learning, and configure permanent static MAC mappings.
+                </p>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <a href="labs/lab07-switch-interfaces-mac-table.html" class="btn btn-primary">
+                        Open Workbook
+                    </a>
+                    <button class="btn btn-cml" onclick="copyCmlCommand('22f10e7e-ca9e-4a8f-831f-b5c29075902f', this)">
+                        ⚡ Copy CML Start
+                    </button>
+                </div>
+            </div>
+
+            <!-- Lab 07B Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h3 class="card-title">Lab 07B: Interface Diagnostics & Duplex Mismatches</h3>
+                        <p style="font-size: 0.8rem; color: #38bdf8; margin: 2px 0;">CCNA 1.1, 2.1 & 2.4 • Part II (Ch 5 & 7)</p>
+                    </div>
+                    <span class="tag tag-cml">CML: 0fd294a1</span>
+                </div>
+                <p class="card-desc">
+                    Isolate autonegotiation parallel detection duplex mismatches, analyze Late Collisions, CRC errors, and Runts in `show interfaces`, and standardize links.
+                </p>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <a href="labs/lab07b-interface-diagnostics-duplex.html" class="btn btn-primary">
+                        Open Workbook
+                    </a>
+                    <button class="btn btn-cml" onclick="copyCmlCommand('0fd294a1-3799-4580-899e-95821c17b581', this)">
+                        ⚡ Copy CML Start
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PART V SECTION -->
+    <div class="lab-section" id="section-part5">
+        <div class="part-section-title">📁 Part V: IPv4 Routing (Chapters 15–19)</div>
+        <div class="grid-2">
+            <!-- Lab 17 Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h3 class="card-title">Lab 17: Multi-Subnet IPv4 Routing</h3>
+                        <p style="font-size: 0.8rem; color: #38bdf8; margin: 2px 0;">CCNA 1.6 & 3.1 • Part V (Ch 15 & 17)</p>
+                    </div>
+                    <span class="tag tag-cml">CML: e7e2a09f</span>
+                </div>
+                <p class="card-desc">
+                    Design VLSM subnets from `192.168.100.0/24` for Sales LAN (/26), Eng LAN (/27), and Point-to-Point WAN (/30). Configure Cisco IOSv routers and verify static routes.
+                </p>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <a href="labs/lab17-multi-subnet-routing.html" class="btn btn-primary">
+                        Open Workbook
+                    </a>
+                    <button class="btn btn-cml" onclick="copyCmlCommand('e7e2a09f-3364-4c45-a401-acf83cdd610e', this)">
+                        ⚡ Copy CML Start
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. MODULAR QUICK-REFERENCE & CHEAT SHEETS -->
+    <h2>📖 Quick-Reference & Exam Cheat Sheets</h2>
+    <div class="card">
+        <details>
+            <summary>📦 Part I Quick Ref: OSI Layers, Encapsulation & ARP Flow</summary>
+            <div class="drawer-content" style="font-size: 0.88rem;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>OSI Layer</th>
+                            <th>TCP/IP Layer</th>
+                            <th>PDU Name</th>
+                            <th>Header Contents & Examples</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Layer 7, 6, 5 (App/Pres/Sess)</td>
+                            <td>Application</td>
+                            <td><strong>Data</strong></td>
+                            <td>HTTP, SSH, DNS, Telnet payload</td>
+                        </tr>
+                        <tr>
+                            <td>Layer 4 (Transport)</td>
+                            <td>Transport</td>
+                            <td><strong>Segment</strong></td>
+                            <td>Source Port, Destination Port, TCP Sequence/ACK</td>
+                        </tr>
+                        <tr>
+                            <td>Layer 3 (Network)</td>
+                            <td>Internet</td>
+                            <td><strong>Packet</strong></td>
+                            <td>Source IP, Destination IP, TTL, Protocol ID</td>
+                        </tr>
+                        <tr>
+                            <td>Layer 2 (Data Link)</td>
+                            <td>Link / Network Access</td>
+                            <td><strong>Frame</strong></td>
+                            <td>Source MAC, Destination MAC, Type field, FCS Trailer</td>
+                        </tr>
+                        <tr>
+                            <td>Layer 1 (Physical)</td>
+                            <td>Link / Network Access</td>
+                            <td><strong>Bits</strong></td>
+                            <td>Electrical voltages, fiber light pulses, RF signals</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </details>
+
+        <details>
+            <summary>⚡ Part II Quick Ref: Cisco Memory Subsystems & CLI Shortcuts</summary>
+            <div class="drawer-content" style="font-size: 0.88rem;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px;">
+                    <div>
+                        <h4 style="color: var(--accent-amber); margin: 0 0 6px 0;">4 Cisco Memory Types:</h4>
+                        <ul>
+                            <li><strong>RAM (Volatile)</strong>: Active <code>running-config</code>, MAC table, ARP table, routing table. Erased on reboot!</li>
+                            <li><strong>NVRAM (Non-Volatile)</strong>: <code>startup-config</code> and config register. Retained on reboot.</li>
+                            <li><strong>Flash</strong>: Cisco IOS XE operating system image binary files.</li>
+                            <li><strong>ROM</strong>: Bootstrap loader, POST diagnostics, ROMMON recovery.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 style="color: var(--accent-cyan); margin: 0 0 6px 0;">Essential CLI Navigation Shortcuts:</h4>
+                        <ul>
+                            <li><code>Ctrl+A</code> / <code>Ctrl+E</code>: Jump to line beginning / end</li>
+                            <li><code>Ctrl+U</code>: Delete entire command line</li>
+                            <li><code>Ctrl+Z</code> or <code>end</code>: Exit directly to Privileged EXEC (<code>#</code>)</li>
+                            <li><code>do &lt;command&gt;</code>: Execute EXEC command from config submodes</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </details>
+
+        <details>
+            <summary>🔢 Subnetting Quick Ref: Magic Number & Subnet Mask Chart</summary>
+            <div class="drawer-content" style="font-size: 0.88rem;">
+                <p><strong>Magic Number Formula:</strong> <code>Magic Number = 256 - Mask Octet Value</code> (Identifies the subnet step size in the interesting octet).</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Prefix</th>
+                            <th>Subnet Mask</th>
+                            <th>Interesting Octet Value</th>
+                            <th>Magic Number (Step Size)</th>
+                            <th>Usable Hosts ($2^h - 2$)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><code>/24</code></td><td><code>255.255.255.0</code></td><td>0</td><td>256</td><td>254</td></tr>
+                        <tr><td><code>/25</code></td><td><code>255.255.255.128</code></td><td>128</td><td><strong>128</strong></td><td>126</td></tr>
+                        <tr><td><code>/26</code></td><td><code>255.255.255.192</code></td><td>192</td><td><strong>64</strong></td><td>62</td></tr>
+                        <tr><td><code>/27</code></td><td><code>255.255.255.224</code></td><td>224</td><td><strong>32</strong></td><td>30</td></tr>
+                        <tr><td><code>/28</code></td><td><code>255.255.255.240</code></td><td>240</td><td><strong>16</strong></td><td>14</td></tr>
+                        <tr><td><code>/29</code></td><td><code>255.255.255.248</code></td><td>248</td><td><strong>8</strong></td><td>6</td></tr>
+                        <tr><td><code>/30</code></td><td><code>255.255.255.252</code></td><td>252</td><td><strong>4</strong></td><td>2 (WAN Links)</td></tr>
+                        <tr><td><code>/32</code></td><td><code>255.255.255.255</code></td><td>255</td><td><strong>1</strong></td><td>1 (Host Route)</td></tr>
+                    </tbody>
+                </table>
             </div>
         </details>
     </div>
 
-    <!-- Lab Catalog -->
-    <h2>🧪 Interactive Lab Workbooks</h2>
-    <div class="grid-2">
-        <!-- Lab 09 Card -->
-        <div class="card">
-            <div class="card-header">
-                <div>
-                    <h3 class="card-title">Lab 09: Multi-Subnet IPv4 Routing</h3>
-                    <p style="font-size: 0.8rem; color: #38bdf8; margin: 2px 0;">CCNA 1.6 & 3.1 • Est. 35 Mins</p>
-                </div>
-                <span class="tag tag-cml">CML Ready</span>
-            </div>
-            <p class="card-desc">
-                Design VLSM subnets from <code>192.168.100.0/24</code> for Sales LAN, Eng LAN, and Point-to-Point WAN. Configure Cisco IOSv routers and verify end-to-end routing.
-            </p>
-            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <a href="labs/lab09-multi-subnet-routing.html" class="btn btn-primary">
-                    Open Lab Workbook
-                </a>
-                <button class="btn btn-secondary" onclick="copySnippet('python3 ~/ccna-study/scripts/cml_client.py start 86e5272c-f7a7-40b3-84ab-47ff9f969786')">
-                    📋 Copy CML Start CLI
-                </button>
-            </div>
-        </div>
-
-        <!-- Quick CML Control Card -->
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">⚡ CML Controller CLI</h3>
-                <span class="tag tag-cml">cml-controller.internal</span>
-            </div>
-            <p class="card-desc">
-                Manage your lab topologies directly on your Proxmox server from your terminal:
-            </p>
-            <pre><code># 1. List all labs
-python3 ~/ccna-study/scripts/cml_client.py list
-
-# 2. Start Lab 09
-python3 ~/ccna-study/scripts/cml_client.py start 86e5272c-f7a7-40b3-84ab-47ff9f969786
-
-# 3. Stop Lab 09
-python3 ~/ccna-study/scripts/cml_client.py stop 86e5272c-f7a7-40b3-84ab-47ff9f969786</code></pre>
-        </div>
-    </div>
-
-    <!-- Daily Study & Lab Workflow -->
-    <h2>🔄 Daily Study & Lab Workflow</h2>
-    <div class="card">
-        <div class="workflow-step">
-            <div class="step-num">Step 1 • Diagnostic Warmup (5 Mins)</div>
-            <div class="step-title">Run a pre-chapter DIKTA assessment with Antigravity</div>
-            <div class="step-prompt">"I'm ready for Chapter 9. Run a 4-question DIKTA diagnostic quiz on subnet design."</div>
-        </div>
-
-        <div class="workflow-step">
-            <div class="step-num">Step 2 • Active Reading (30 Mins)</div>
-            <div class="step-title">Read Odom Cert Guide & ask for first-principles explanations</div>
-            <div class="step-prompt">"Explain how the magic number works when calculating a /21 subnet mask."</div>
-        </div>
-
-        <div class="workflow-step">
-            <div class="step-num">Step 3 • Hands-On Lab in CML (35 Mins)</div>
-            <div class="step-title">Open the interactive lab guide and configure on CML</div>
-            <div class="step-prompt">Open: ~/ccna-study/labs/lab09-multi-subnet-routing.html</div>
-        </div>
-
-        <div class="workflow-step">
-            <div class="step-num">Step 4 • Break-Fix Drill (15 Mins)</div>
-            <div class="step-title">Let the assistant inject a mystery fault for you to troubleshoot</div>
-            <div class="step-prompt">"Break something in my CML Lab 9 topology and give me only the symptom."</div>
-        </div>
-    </div>
-
-    <!-- Interactive Subnetting Trainer Mini-App -->
+    <!-- 6. MULTI-LEVEL MENTAL SUBNETTING TRAINER -->
     <h2>🧠 Mental Subnetting Speed Trainer</h2>
     <div class="card">
-        <p class="card-desc">Practice calculating the Subnet ID and Broadcast Address in your head:</p>
-        <div class="trainer-box">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-weight: 700; color: #94a3b8; font-size: 0.85rem; text-transform: uppercase;">Current Challenge IP & Prefix:</span>
-                <button class="btn btn-secondary" onclick="generateSubnetChallenge()">🎲 New Challenge</button>
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+            <p class="card-desc" style="margin: 0;">Calculate the Subnet ID and Broadcast Address in your head:</p>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <span class="score-pill" id="trainer-score">Score: 0</span>
+                <span class="score-pill" style="color: var(--accent-amber);" id="trainer-streak">Streak: 0 🔥</span>
             </div>
-            <div class="trainer-target" id="challenge-ip">172.16.45.14 /21</div>
+        </div>
+
+        <div class="trainer-box">
+            <!-- Mode Buttons -->
+            <div class="trainer-mode-group">
+                <span style="font-size: 0.8rem; font-weight: 700; color: #94a3b8; align-self: center; margin-right: 4px;">DIFFICULTY:</span>
+                <button class="mode-btn active" onclick="setTrainerMode('classC', this)">Class C (/24 - /30)</button>
+                <button class="mode-btn" onclick="setTrainerMode('classB', this)">Class B (/16 - /23)</button>
+                <button class="mode-btn" onclick="setTrainerMode('classA', this)">Class A (/8 - /15)</button>
+                <button class="btn btn-secondary" style="margin-left: auto; padding: 5px 12px; font-size: 0.8rem;" onclick="generateSubnetChallenge()">🎲 New Challenge</button>
+            </div>
+
+            <div class="trainer-target" id="challenge-ip">192.168.100.75 /26</div>
 
             <div class="trainer-input-row">
-                <input type="text" id="ans-subnet" class="trainer-input" placeholder="Subnet ID (e.g. 172.16.40.0)">
-                <input type="text" id="ans-broadcast" class="trainer-input" placeholder="Broadcast (e.g. 172.16.47.255)">
+                <input type="text" id="ans-subnet" class="trainer-input" placeholder="Subnet ID (e.g. 192.168.100.64)">
+                <input type="text" id="ans-broadcast" class="trainer-input" placeholder="Broadcast (e.g. 192.168.100.127)">
                 <button class="btn btn-green" onclick="checkSubnetAnswer()">Check Answer</button>
             </div>
             <div class="trainer-result" id="trainer-feedback"></div>
         </div>
     </div>
 
+    <!-- 7. DAILY STUDY & LAB WORKFLOW -->
+    <h2>🔄 Daily Study & Lab Workflow</h2>
+    <div class="card">
+        <div class="workflow-step">
+            <div class="step-num">Step 1 • Diagnostic Warmup (5 Mins)</div>
+            <div class="step-title">Run a pre-chapter DIKTA assessment with Antigravity</div>
+            <div class="step-prompt">"I'm ready for Part II Ethernet Switching. Run a 4-question DIKTA diagnostic quiz on Chapter 6 & 7."</div>
+        </div>
+
+        <div class="workflow-step">
+            <div class="step-num">Step 2 • Active Reading (30 Mins)</div>
+            <div class="step-title">Read Odom Cert Guide & ask for first-principles explanations</div>
+            <div class="step-prompt">"Explain why autonegotiation parallel detection causes a duplex mismatch."</div>
+        </div>
+
+        <div class="workflow-step">
+            <div class="step-num">Step 3 • Hands-On Lab in CML (30 Mins)</div>
+            <div class="step-title">Open the interactive lab guide and configure on CML</div>
+            <div class="step-prompt">Open: ~/ccna-study/labs/lab06-switch-management-ssh.html</div>
+        </div>
+
+        <div class="workflow-step">
+            <div class="step-num">Step 4 • Break-Fix Drill (15 Mins)</div>
+            <div class="step-title">Let the assistant inject a mystery fault for you to troubleshoot</div>
+            <div class="step-prompt">"Break something in my CML switch topology and give me only the symptom."</div>
+        </div>
+    </div>
+
+    <!-- 8. CML CONTROLLER AUTOMATION REFERENCE -->
+    <h2>⚡ CML Automation Commands</h2>
+    <div class="card">
+        <p class="card-desc">Execute these commands from your terminal to manage topologies on <code>cml-controller.internal</code>:</p>
+        <pre><code># 1. List all active labs on Proxmox
+python3 ~/ccna-study/scripts/cml_client.py list
+
+# 2. Start a specific lab topology (e.g. Lab 06)
+python3 ~/ccna-study/scripts/cml_client.py start 98a5a03b-fe9e-4f57-bbed-f1f88894cab8
+
+# 3. Stop / Wipe a lab topology
+python3 ~/ccna-study/scripts/cml_client.py stop &lt;lab-uuid&gt;</code></pre>
+    </div>
+
 </div>
 
 <script>
-    function copySnippet(text) {
-        navigator.clipboard.writeText(text).then(() => {
-            alert('Copied CML command to clipboard: ' + text);
+    // Copy CML Start Command
+    function copyCmlCommand(labId, btn) {
+        const cmd = `python3 ~/ccna-study/scripts/cml_client.py start ${labId}`;
+        navigator.clipboard.writeText(cmd).then(() => {
+            const originalText = btn.innerText;
+            btn.innerText = "✓ Copied Start Cmd!";
+            btn.style.background = "#10b981";
+            btn.style.borderColor = "#10b981";
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.style.background = "#581c87";
+                btn.style.borderColor = "#7e22ce";
+            }, 2000);
         });
     }
 
-    const challenges = [
-        { ip: '172.16.45.14 /21', subnet: '172.16.40.0', broadcast: '172.16.47.255', magic: 8 },
-        { ip: '192.168.1.142 /27', subnet: '192.168.1.128', broadcast: '192.168.1.159', magic: 32 },
-        { ip: '10.50.20.100 /20', subnet: '10.50.16.0', broadcast: '10.50.31.255', magic: 16 },
-        { ip: '10.100.5.50 /29', subnet: '10.100.5.48', broadcast: '10.100.5.55', magic: 8 },
-        { ip: '192.168.100.75 /26', subnet: '192.168.100.64', broadcast: '192.168.100.127', magic: 64 },
-        { ip: '172.20.99.45 /19', subnet: '172.20.96.0', broadcast: '172.20.127.255', magic: 32 }
-    ];
+    // Filtering function
+    function filterLabs(category, btn) {
+        document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
 
-    let currentChallenge = challenges[0];
+        const secPart1 = document.getElementById('section-part1');
+        const secPart2 = document.getElementById('section-part2');
+        const secPart5 = document.getElementById('section-part5');
+
+        if (category === 'all') {
+            secPart1.style.display = 'block';
+            secPart2.style.display = 'block';
+            secPart5.style.display = 'block';
+        } else if (category === 'part1') {
+            secPart1.style.display = 'block';
+            secPart2.style.display = 'none';
+            secPart5.style.display = 'none';
+        } else if (category === 'part2') {
+            secPart1.style.display = 'none';
+            secPart2.style.display = 'block';
+            secPart5.style.display = 'none';
+        } else if (category === 'part5') {
+            secPart1.style.display = 'none';
+            secPart2.style.display = 'none';
+            secPart5.style.display = 'block';
+        }
+    }
+
+    // Mental Subnetting Speed Trainer Multi-Level Logic
+    const challengePool = {
+        classC: [
+            { ip: '192.168.100.75 /26', subnet: '192.168.100.64', broadcast: '192.168.100.127', magic: 64 },
+            { ip: '192.168.1.142 /27', subnet: '192.168.1.128', broadcast: '192.168.1.159', magic: 32 },
+            { ip: '192.168.10.50 /29', subnet: '192.168.10.48', broadcast: '192.168.10.55', magic: 8 },
+            { ip: '192.168.5.195 /28', subnet: '192.168.5.192', broadcast: '192.168.5.207', magic: 16 },
+            { ip: '192.168.0.220 /30', subnet: '192.168.0.220', broadcast: '192.168.0.223', magic: 4 },
+            { ip: '192.168.200.10 /25', subnet: '192.168.200.0', broadcast: '192.168.200.127', magic: 128 }
+        ],
+        classB: [
+            { ip: '172.16.45.14 /21', subnet: '172.16.40.0', broadcast: '172.16.47.255', magic: 8 },
+            { ip: '172.20.99.45 /19', subnet: '172.20.96.0', broadcast: '172.20.127.255', magic: 32 },
+            { ip: '172.31.115.80 /22', subnet: '172.31.112.0', broadcast: '172.31.115.255', magic: 4 },
+            { ip: '172.18.200.100 /18', subnet: '172.18.192.0', broadcast: '172.18.255.255', magic: 64 },
+            { ip: '172.25.140.22 /20', subnet: '172.25.128.0', broadcast: '172.25.143.255', magic: 16 }
+        ],
+        classA: [
+            { ip: '10.50.20.100 /12', subnet: '10.48.0.0', broadcast: '10.63.255.255', magic: 16 },
+            { ip: '10.100.5.50 /14', subnet: '10.100.0.0', broadcast: '10.103.255.255', magic: 4 },
+            { ip: '10.210.4.19 /10', subnet: '10.192.0.0', broadcast: '10.255.255.255', magic: 64 },
+            { ip: '10.130.88.5 /13', subnet: '10.128.0.0', broadcast: '10.135.255.255', magic: 8 }
+        ]
+    };
+
+    let currentMode = 'classC';
+    let currentChallenge = challengePool.classC[0];
+    let score = 0;
+    let streak = 0;
+
+    function setTrainerMode(mode, btn) {
+        currentMode = mode;
+        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        generateSubnetChallenge();
+    }
 
     function generateSubnetChallenge() {
-        const idx = Math.floor(Math.random() * challenges.length);
-        currentChallenge = challenges[idx];
+        const pool = challengePool[currentMode];
+        const idx = Math.floor(Math.random() * pool.length);
+        currentChallenge = pool[idx];
         document.getElementById('challenge-ip').innerText = currentChallenge.ip;
         document.getElementById('ans-subnet').value = '';
         document.getElementById('ans-broadcast').value = '';
@@ -443,8 +1005,14 @@ python3 ~/ccna-study/scripts/cml_client.py stop 86e5272c-f7a7-40b3-84ab-47ff9f96
         const feedback = document.getElementById('trainer-feedback');
 
         if (sub === currentChallenge.subnet && bcast === currentChallenge.broadcast) {
-            feedback.innerHTML = `<span style="color: #10b981;">🎉 Correct! Magic number is ${currentChallenge.magic}. Subnet ID: ${currentChallenge.subnet}, Broadcast: ${currentChallenge.broadcast}</span>`;
+            score += 10;
+            streak += 1;
+            document.getElementById('trainer-score').innerText = `Score: ${score}`;
+            document.getElementById('trainer-streak').innerText = `Streak: ${streak} 🔥`;
+            feedback.innerHTML = `<span style="color: #10b981;">🎉 Correct! Magic number is ${currentChallenge.magic}. Subnet ID: <code>${currentChallenge.subnet}</code> | Broadcast: <code>${currentChallenge.broadcast}</code></span>`;
         } else {
+            streak = 0;
+            document.getElementById('trainer-streak').innerText = `Streak: 0 🔥`;
             feedback.innerHTML = `<span style="color: #f59e0b;">❌ Not quite. Expected Subnet: <code>${currentChallenge.subnet}</code> | Broadcast: <code>${currentChallenge.broadcast}</code> (Magic Number: ${currentChallenge.magic})</span>`;
         }
     }

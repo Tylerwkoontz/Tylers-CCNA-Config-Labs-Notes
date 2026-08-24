@@ -1,0 +1,72 @@
+lab:
+  title: 'CCNA Lab 04: Cisco IOS CLI & Memory Management'
+  description: 'Vol 1 Ch 4: EXEC Modes & Memory (Hierarchical Layout)'
+  notes: "# CCNA Exam Lab: Cisco IOS CLI Navigation & Memory Architecture\n**Exam\
+    \ Blueprint**: CCNA 200-301 v1.1 Domain 2.8\n**Focus**: Cisco Press OCG Vol 1,\
+    \ Chapter 4\n\n---\n## \U0001F3E2 Scenario & Network Topology\nYou are connected\
+    \ via out-of-band console (`PC-Console`) to a newly provisioned Cisco Catalyst\
+    \ switch `SW1`. You must perform initial CLI setup, configure console session\
+    \ parameters, explore memory subsystems, and persist configurations.\n\n---\n\
+    ## \U0001F4CB Exam Tasks & Technical Requirements\n1. **Hostname & CLI Modes**:\n\
+    \   - Transition from User EXEC mode to Privileged EXEC mode.\n   - Set the global\
+    \ device hostname to `SW1`.\n2. **Console Management Line Optimization**:\n  \
+    \ - Configure `line console 0` so that system log messages do not interrupt active\
+    \ command typing.\n   - Prevent the console session from timing out during administrative\
+    \ work.\n3. **CLI Buffer Tuning**:\n   - Configure the CLI history buffer for\
+    \ the current session to record up to 50 commands.\n4. **Submode Command Execution**:\n\
+    \   - Enter interface configuration submode for `GigabitEthernet0/1`.\n   - Without\
+    \ returning to Privileged EXEC mode, execute a command to view the summary status\
+    \ of all IP interfaces.\n5. **Memory Subsystems & Configuration Persistence**:\n\
+    \   - Display the active configuration stored in volatile RAM.\n   - Display the\
+    \ configuration stored in non-volatile NVRAM.\n   - Save the active configuration\
+    \ permanently to NVRAM.\n\n---\n## \U0001F50D Success & Verification Criteria\n\
+    - Command prompt displays `SW1#`.\n- `show history` reflects the expanded command\
+    \ buffer.\n- `show startup-config` displays the saved configuration identical\
+    \ to `show running-config`.\n- *Need a hint? Check the interactive workbook in\
+    \ `~/ccna-study/labs/lab04-cli-navigation-memory.html`.*"
+  version: 0.3.1
+  node_staging:
+    enabled: false
+    start_remaining: true
+    abort_on_failure: false
+nodes:
+- id: n0
+  label: SW1
+  node_definition: iosvl2
+  x: 0
+  y: -120
+  interfaces:
+  - id: i0
+    label: Loopback0
+    type: loopback
+  - id: i1
+    label: GigabitEthernet0/0
+    type: physical
+    slot: 0
+  - id: i2
+    label: GigabitEthernet0/1
+    type: physical
+    slot: 1
+  configuration:
+  - name: ios_config.txt
+    content: "hostname Switch\nline con 0\n logging synchronous\n exec-timeout 0 0\n\
+      end\n"
+- id: n1
+  label: PC-Console
+  node_definition: alpine
+  x: 0
+  y: 120
+  interfaces:
+  - id: i0
+    label: eth0
+    type: physical
+    slot: 0
+links:
+- id: l0
+  n1: n1
+  n2: n0
+  i1: i0
+  i2: i1
+  label: PC-Console-eth0<->SW1-Gi0/0
+annotations: []
+smart_annotations: []

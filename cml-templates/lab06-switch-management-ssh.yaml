@@ -1,0 +1,82 @@
+lab:
+  title: 'CCNA Lab 06: Switch Management & Hardened SSH'
+  description: 'Vol 1 Ch 4 & 6: Switch Control Plane & SSH (Hierarchical Layout)'
+  notes: "# CCNA Exam Lab: Switch Management, SVI & Hardened SSH Access\n**Exam Blueprint**:\
+    \ CCNA 200-301 v1.1 Domains 1.1, 2.1 & 5.5\n**Focus**: Cisco Press OCG Vol 1,\
+    \ Chapters 4 & 6\n\n---\n## \U0001F3E2 Scenario & Network Topology\nYou are responsible\
+    \ for securing management access to access switch `SW1` in accordance with enterprise\
+    \ security policy. You must configure an in-band management SVI, configure the\
+    \ default gateway, and restrict remote access to hardened SSH version 2.\n\n###\
+    \ Addressing & Security Policy\n| Parameter | Specification / Value |\n| :---\
+    \ | :--- |\n| **Switch Hostname** | `SW1` |\n| **Privileged Password** | Encrypted\
+    \ secret: `cisco123` |\n| **Management SVI** | `VLAN 1` IP: `192.168.1.2/24` |\n\
+    | **Default Gateway** | `192.168.1.1` |\n| **Domain Name** | `certskills.internal`\
+    \ |\n| **Local Admin Account** | Username: `admin` / Password secret: `AdminSSH#2026`\
+    \ |\n| **RSA Key Modulus** | `2048` bits |\n| **SSH Protocol Version** | Force\
+    \ SSH Version 2 |\n| **VTY Security (Lines 0\u201315)**| Local login required;\
+    \ transport restricted to SSH only |\n\n---\n## \U0001F4CB Exam Tasks & Technical\
+    \ Requirements\n1. **Device Identity & Control Plane Security**:\n   - Configure\
+    \ the switch hostname and privileged EXEC secret password.\n   - Enable the Cisco\
+    \ IOS service to encrypt plain-text passwords in the configuration.\n2. **Management\
+    \ Interface & Routing**:\n   - Configure the management SVI on VLAN 1 with the\
+    \ assigned IP address and subnet mask. Ensure the interface is brought up.\n \
+    \  - Configure the switch with its default gateway IP address.\n3. **Hardened\
+    \ SSH Access**:\n   - Configure the enterprise IP domain name.\n   - Create the\
+    \ local administrator user account with secret password encryption.\n   - Generate\
+    \ a 2048-bit RSA key pair for cryptographic SSH operation.\n   - Configure the\
+    \ switch to operate exclusively with SSH version 2.\n4. **VTY Line Hardening**:\n\
+    \   - Configure VTY lines 0 through 15 to authenticate incoming sessions against\
+    \ the local user database.\n   - Restrict incoming transport on all VTY lines\
+    \ so that only SSH connections are accepted (Telnet must be blocked).\n5. **Configuration\
+    \ Persistence**:\n   - Save the running configuration to NVRAM.\n\n---\n## \U0001F50D\
+    \ Success & Verification Criteria\n- `show ip interface brief` indicates interface\
+    \ `Vlan1` is in `up/up` status.\n- `show ip ssh` confirms SSH version 2 is active.\n\
+    - From `PC-Admin` (`192.168.1.10`), initiate an SSH session to `192.168.1.2` using\
+    \ the `admin` credentials and verify successful login.\n- *Need a hint? Check\
+    \ the interactive workbook in `~/ccna-study/labs/lab06-switch-management-ssh.html`.*"
+  version: 0.3.1
+  node_staging:
+    enabled: false
+    start_remaining: true
+    abort_on_failure: false
+nodes:
+- id: n0
+  label: SW1
+  node_definition: iosvl2
+  x: 0
+  y: -120
+  interfaces:
+  - id: i0
+    label: Loopback0
+    type: loopback
+  - id: i1
+    label: GigabitEthernet0/0
+    type: physical
+    slot: 0
+  - id: i2
+    label: GigabitEthernet0/1
+    type: physical
+    slot: 1
+  configuration:
+  - name: ios_config.txt
+    content: "hostname Switch\nline con 0\n logging synchronous\n exec-timeout 0 0\n\
+      end\n"
+- id: n1
+  label: PC-Admin
+  node_definition: alpine
+  x: 0
+  y: 120
+  interfaces:
+  - id: i0
+    label: eth0
+    type: physical
+    slot: 0
+links:
+- id: l0
+  n1: n1
+  n2: n0
+  i1: i0
+  i2: i2
+  label: PC-Admin-eth0<->SW1-Gi0/1
+annotations: []
+smart_annotations: []

@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab 17: Multi-Subnet IPv4 Routing & Static Routes | Tyler's CCNA Lab Hub</title>
+    <style>
+        :root {
+            --bg-body: #0b0f19;
+            --bg-card: #151e2e;
+            --bg-inner: #0f172a;
+            --bg-code: #070a12;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-blue: #0284c7;
+            --accent-cyan: #38bdf8;
+            --accent-green: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-purple: #8b5cf6;
+            --border-color: #223049;
+            --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        }
+
+        body {
+            margin: 0;
+            padding: 32px 20px;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: var(--font);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1040px;
+            margin: 0 auto;
+        }
+
+        /* Nav breadcrumb */
+        .top-nav {
+            margin-bottom: 20px;
+        }
+        .top-nav a {
+            color: var(--accent-cyan);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        .top-nav a:hover { text-decoration: underline; }
+
+        /* Header Card */
+        .lab-header {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 24px 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.4);
+        }
+
+        .badge-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-blue   { background: #0369a1; color: #e0f2fe; }
+        .badge-purple { background: #581c87; color: #f3e8ff; }
+        .badge-amber  { background: #b45309; color: #fef3c7; }
+        .badge-green  { background: #047857; color: #d1fae5; }
+
+        h1 { margin: 0 0 10px 0; font-size: 1.85rem; color: #ffffff; letter-spacing: -0.5px; }
+        h2 { font-size: 1.3rem; color: var(--accent-cyan); margin: 0 0 16px 0; display: flex; align-items: center; gap: 8px; }
+        p { margin: 0 0 12px 0; }
+
+        /* Section Cards */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        /* SVG Topology */
+        .topology-svg {
+            width: 100%;
+            height: auto;
+            max-height: 250px;
+            background: var(--bg-code);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin: 14px 0 6px 0;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            font-size: 0.88rem;
+        }
+
+        th, td {
+            padding: 10px 14px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--bg-inner);
+            color: var(--accent-cyan);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.78rem;
+            letter-spacing: 0.5px;
+        }
+
+        tr:hover { background-color: rgba(255, 255, 255, 0.02); }
+
+        /* Requirement Groups & Clean Lists */
+        .req-group {
+            margin-bottom: 22px;
+        }
+        .req-group:last-child {
+            margin-bottom: 0;
+        }
+        .req-group h3 {
+            font-size: 1.05rem;
+            color: var(--accent-cyan);
+            margin: 0 0 10px 0;
+            font-weight: 700;
+        }
+        .clean-list {
+            margin: 0;
+            padding-left: 24px;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+        .clean-list li {
+            margin-bottom: 8px;
+        }
+        .clean-list li:last-child {
+            margin-bottom: 0;
+        }
+        .clean-list strong {
+            color: #ffffff;
+        }
+
+        /* Verification Steps */
+        .verif-step {
+            background: var(--bg-inner);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 14px;
+        }
+
+        .verif-title {
+            font-weight: 700;
+            color: #ffffff;
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Code Blocks */
+        .code-block {
+            position: relative;
+            margin: 10px 0 0 0;
+        }
+
+        pre {
+            background-color: var(--bg-code);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 14px 16px;
+            overflow-x: auto;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: #e2e8f0;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #223049;
+            color: #f8fafc;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            padding: 5px 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover { background: var(--accent-blue); border-color: var(--accent-blue); }
+
+        /* Solution Drawer */
+        details.solution-drawer {
+            border-top: 4px solid var(--accent-green);
+            cursor: default;
+        }
+
+        details.solution-drawer summary {
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            user-select: none;
+            padding: 4px 0;
+        }
+
+        details.solution-drawer summary::-webkit-details-marker {
+            display: none;
+        }
+
+        details.solution-drawer summary:hover {
+            color: #ffffff;
+        }
+
+        .solution-badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            background: #1e293b;
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            transition: all 0.2s;
+        }
+
+        details[open].solution-drawer .solution-badge {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--accent-green);
+            border-color: var(--accent-green);
+        }
+
+        /* Solution Tabs */
+        .tabs-header {
+            display: flex;
+            gap: 8px;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 16px;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 10px 18px;
+            font-size: 0.92rem;
+            font-weight: 700;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover { color: #ffffff; }
+        .tab-btn.active {
+            color: var(--accent-cyan);
+            border-bottom-color: var(--accent-cyan);
+        }
+
+        .tab-pane { display: none; }
+        .tab-pane.active { display: block; }
+
+        /* Initial Baseline State Box */
+        .baseline-box {
+            background: var(--bg-inner);
+            border-left: 4px solid var(--accent-amber);
+            border-radius: 6px;
+            padding: 14px 18px;
+            margin: 16px 0 0 0;
+            font-size: 0.9rem;
+        }
+        .baseline-box strong { color: var(--accent-amber); }
+
+        /* Commentary styling */
+        .commentary-section {
+            background: var(--bg-inner);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 18px 20px;
+            margin-bottom: 16px;
+            font-size: 0.92rem;
+        }
+        .commentary-section h4 {
+            margin: 0 0 8px 0;
+            color: var(--accent-amber);
+            font-size: 1rem;
+        }
+        .commentary-section p { margin-bottom: 10px; }
+        .commentary-section p:last-child { margin-bottom: 0; }
+        .commentary-section code {
+            background: var(--bg-code);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: var(--accent-cyan);
+            font-family: var(--font-mono);
+            font-size: 0.85em;
+        }
+
+        /* Print Media Styles */
+        @media print {
+            body { background: #ffffff; color: #000000; padding: 0; }
+            .lab-header, .card, .verif-step, .commentary-section, .baseline-box { border: 1px solid #ccc; box-shadow: none; background: #ffffff; color: #000000; }
+            h1, h2, h3, .verif-title, details.solution-drawer summary { color: #000000 !important; }
+            pre { background: #f8f9fa; color: #000000; border: 1px solid #ddd; }
+            .copy-btn, .top-nav, .solution-badge { display: none !important; }
+            details.solution-drawer { display: block !important; }
+            details.solution-drawer .solution-content { display: block !important; margin-top: 0 !important; }
+            .tab-pane { display: block !important; margin-bottom: 20px; }
+            .tabs-header { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Top Navigation Breadcrumb -->
+    <div class="top-nav">
+        <a href="../index.html">&larr; Back to Master Dashboard</a>
+    </div>
+
+    <!-- 1. HEADER & METADATA -->
+    <div class="lab-header">
+        <div class="badge-group">
+            <span class="badge badge-blue">CCNA 200-301 (Domains 1.6 & 3.1)</span>
+            <span class="badge badge-purple">CertSkills Config Lab #17</span>
+            <span class="badge badge-amber">Intermediate</span>
+            <span class="badge badge-green">Est: 35 Mins</span>
+        </div>
+        <h1>Lab 17: Multi-Subnet IPv4 Routing & Static Routes</h1>
+        <p style="color: var(--text-muted); margin: 0;">
+            <strong>Curriculum Focus:</strong> Cisco Press Official Cert Guide Vol 1, Part V (Chapters 15 & 17) • <strong>Topics:</strong> VLSM Subnet Sizing, Cisco IOS Interface Configuration, Static Routing Logic, and End-to-End ICMP Validation.
+        </p>
+    </div>
+
+    <!-- 2. TOPOLOGY & ADDRESSING REFERENCE -->
+    <div class="card">
+        <h2>🗺️ Topology & Addressing Reference</h2>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">
+            <strong>Scenario:</strong> You are allocated the network block <code>192.168.100.0/24</code>. You must subnet it to support the Sales Department (50+ hosts), Engineering Department (25+ hosts), and a point-to-point WAN link between Router 1 and Router 2.
+        </p>
+
+        <!-- Hierarchical Vector SVG Diagram -->
+        <svg class="topology-svg" viewBox="0 0 800 240" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                    <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#1e293b" stroke-width="0.5"/>
+                </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grid)" />
+
+            <!-- Tier Background Bands -->
+            <rect x="20" y="15" width="760" height="95" rx="6" fill="#1e293b" fill-opacity="0.3" stroke="#334155" stroke-dasharray="4,4"/>
+            <text x="35" y="32" fill="#f59e0b" font-size="10" font-weight="bold" letter-spacing="1">🏢 CORE & WAN ROUTING TIER</text>
+
+            <rect x="20" y="130" width="760" height="95" rx="6" fill="#1e293b" fill-opacity="0.3" stroke="#334155" stroke-dasharray="4,4"/>
+            <text x="35" y="147" fill="#38bdf8" font-size="10" font-weight="bold" letter-spacing="1">💻 DEPARTMENTAL LAN ENDPOINT TIER</text>
+
+            <!-- WAN Horizontal Link -->
+            <line x1="290" y1="62" x2="510" y2="62" stroke="#f59e0b" stroke-width="4" stroke-dasharray="8,4"/>
+            <rect x="330" y="48" width="140" height="24" rx="4" fill="#78350f"/>
+            <text x="400" y="64" fill="#fef3c7" font-size="9" font-weight="bold" text-anchor="middle">Subnet C (WAN): .96/30</text>
+
+            <!-- Downlinks to LANs -->
+            <line x1="260" y1="92" x2="260" y2="155" stroke="#38bdf8" stroke-width="3" />
+            <line x1="540" y1="92" x2="540" y2="155" stroke="#10b981" stroke-width="3" />
+
+            <!-- R1 (Top Left) -->
+            <circle cx="260" cy="62" r="28" fill="#151e2e" stroke="#f59e0b" stroke-width="2"/>
+            <text x="260" y="67" fill="#f59e0b" font-size="13" font-weight="bold" text-anchor="middle">R1</text>
+            <text x="295" y="55" fill="#f59e0b" font-size="9">Gi0/0 (.97)</text>
+            <text x="265" y="110" fill="#38bdf8" font-size="9">Gi0/1 (.1)</text>
+
+            <!-- R2 (Top Right) -->
+            <circle cx="540" cy="62" r="28" fill="#151e2e" stroke="#f59e0b" stroke-width="2"/>
+            <text x="540" y="67" fill="#f59e0b" font-size="13" font-weight="bold" text-anchor="middle">R2</text>
+            <text x="470" y="55" fill="#f59e0b" font-size="9">Gi0/0 (.98)</text>
+            <text x="545" y="110" fill="#10b981" font-size="9">Gi0/1 (.65)</text>
+
+            <!-- PC-Sales (Bottom Left) -->
+            <circle cx="260" cy="180" r="26" fill="#151e2e" stroke="#38bdf8" stroke-width="2"/>
+            <text x="260" y="184" fill="#f8fafc" font-size="10" font-weight="bold" text-anchor="middle">PC-Sales</text>
+            <text x="260" y="218" fill="#94a3b8" font-size="8" text-anchor="middle">Subnet A: 192.168.100.10/26</text>
+            <text x="265" y="150" fill="#38bdf8" font-size="9">eth0</text>
+
+            <!-- PC-Eng (Bottom Right) -->
+            <circle cx="540" cy="180" r="26" fill="#151e2e" stroke="#10b981" stroke-width="2"/>
+            <text x="540" y="184" fill="#f8fafc" font-size="10" font-weight="bold" text-anchor="middle">PC-Eng</text>
+            <text x="540" y="218" fill="#94a3b8" font-size="8" text-anchor="middle">Subnet B: 192.168.100.70/27</text>
+            <text x="545" y="150" fill="#10b981" font-size="9">eth0</text>
+        </svg>
+
+        <!-- Complete Addressing Table -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Device</th>
+                    <th>Interface</th>
+                    <th>IPv4 Address</th>
+                    <th>Subnet Mask</th>
+                    <th>Subnet ID / Prefix</th>
+                    <th>Default Gateway</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>R1</strong></td>
+                    <td><code>GigabitEthernet0/0</code></td>
+                    <td><code>192.168.100.97</code></td>
+                    <td><code>255.255.255.252</code></td>
+                    <td><code>192.168.100.96/30</code></td>
+                    <td>N/A</td>
+                </tr>
+                <tr>
+                    <td><strong>R1</strong></td>
+                    <td><code>GigabitEthernet0/1</code></td>
+                    <td><code>192.168.100.1</code></td>
+                    <td><code>255.255.255.192</code></td>
+                    <td><code>192.168.100.0/26</code></td>
+                    <td>N/A</td>
+                </tr>
+                <tr>
+                    <td><strong>R2</strong></td>
+                    <td><code>GigabitEthernet0/0</code></td>
+                    <td><code>192.168.100.98</code></td>
+                    <td><code>255.255.255.252</code></td>
+                    <td><code>192.168.100.96/30</code></td>
+                    <td>N/A</td>
+                </tr>
+                <tr>
+                    <td><strong>R2</strong></td>
+                    <td><code>GigabitEthernet0/1</code></td>
+                    <td><code>192.168.100.65</code></td>
+                    <td><code>255.255.255.224</code></td>
+                    <td><code>192.168.100.64/27</code></td>
+                    <td>N/A</td>
+                </tr>
+                <tr>
+                    <td><strong>PC-Sales</strong></td>
+                    <td><code>eth0</code></td>
+                    <td><code>192.168.100.10</code></td>
+                    <td><code>255.255.255.192</code></td>
+                    <td><code>192.168.100.0/26</code></td>
+                    <td><code>192.168.100.1</code></td>
+                </tr>
+                <tr>
+                    <td><strong>PC-Eng</strong></td>
+                    <td><code>eth0</code></td>
+                    <td><code>192.168.100.70</code></td>
+                    <td><code>255.255.255.224</code></td>
+                    <td><code>192.168.100.64/27</code></td>
+                    <td><code>192.168.100.65</code></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Initial Device State -->
+        <div class="baseline-box">
+            <strong>Initial Baseline State:</strong> Routers R1 and R2 are in default factory unconfigured state with no IP addresses or routing protocols configured. All interfaces are administratively shutdown by default. Endpoints PC-Sales and PC-Eng are unconfigured.
+        </div>
+    </div>
+
+    <!-- 3. ENGINEERING REQUIREMENTS SPECIFICATION -->
+    <div class="card">
+        <h2>📋 Engineering Requirements</h2>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">
+            Configure the topology devices to meet the following engineering specifications. Reference the addressing table and topology map to determine correct IP parameters and routing next-hops.
+        </p>
+
+        <div class="req-group">
+            <h3>1. Device Hostnames & Console Usability:</h3>
+            <ul class="clean-list">
+                <li>Configure the device hostname <strong>R1</strong> on Router 1 and <strong>R2</strong> on Router 2.</li>
+                <li>On both routers, configure console line 0 so unsolicited syslog messages do not interrupt command entry.</li>
+                <li>Disable console inactivity session timeouts on both routers.</li>
+            </ul>
+        </div>
+
+        <div class="req-group">
+            <h3>2. Router Interfaces & Enablement:</h3>
+            <ul class="clean-list">
+                <li>On <strong>R1</strong>, configure IPv4 addresses, dotted-decimal subnet masks, and descriptions on <code>GigabitEthernet0/0</code> (WAN Link) and <code>GigabitEthernet0/1</code> (Sales LAN) according to the addressing table.</li>
+                <li>On <strong>R2</strong>, configure IPv4 addresses, dotted-decimal subnet masks, and descriptions on <code>GigabitEthernet0/0</code> (WAN Link) and <code>GigabitEthernet0/1</code> (Engineering LAN) according to the addressing table.</li>
+                <li>Ensure all configured router interfaces are enabled and operational (no shutdown).</li>
+            </ul>
+        </div>
+
+        <div class="req-group">
+            <h3>3. IPv4 Static Routing:</h3>
+            <ul class="clean-list">
+                <li>On <strong>R1</strong>, configure an IPv4 static route to reach the Engineering Department LAN subnet (<code>192.168.100.64/27</code>) using R2's point-to-point WAN interface IP address as the next-hop.</li>
+                <li>On <strong>R2</strong>, configure an IPv4 static route to reach the Sales Department LAN subnet (<code>192.168.100.0/26</code>) using R1's point-to-point WAN interface IP address as the next-hop.</li>
+            </ul>
+        </div>
+
+        <div class="req-group">
+            <h3>4. Host Endpoints & Configuration Persistence:</h3>
+            <ul class="clean-list">
+                <li>Configure <strong>PC-Sales</strong> and <strong>PC-Eng</strong> with their respective IPv4 addresses, prefix lengths, and default gateways per the addressing specification.</li>
+                <li>Save the running configuration to NVRAM on both routers so changes persist across reboots.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 4. VERIFICATION & VALIDATION -->
+    <div class="card">
+        <h2>🔍 Verification & Validation Steps</h2>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">
+            Run these verification commands on your routers and endpoints to confirm your configuration is active and functional.
+        </p>
+
+        <!-- Step 1 -->
+        <div class="verif-step">
+            <div class="verif-title">
+                <span>1. Verify Physical & Line Protocol Status</span>
+            </div>
+            <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 6px;">Execute on both R1 and R2 to confirm interfaces are in the <code>up / up</code> operational state:</p>
+            <div class="code-block">
+                <pre><code>R1# show ip interface brief
+Interface              IP-Address      OK? Method Status                Protocol
+GigabitEthernet0/0     192.168.100.97  YES manual up                    up      
+GigabitEthernet0/1     192.168.100.1   YES manual up                    up      </code></pre>
+            </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="verif-step">
+            <div class="verif-title">
+                <span>2. Verify Routing Table Entries</span>
+            </div>
+            <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 6px;">Check R1 routing table. Verify Connected (<code>C</code>), Local (<code>L</code>), and Static (<code>S</code>) routes:</p>
+            <div class="code-block">
+                <pre><code>R1# show ip route
+Gateway of last resort is not set
+
+     192.168.100.0/24 is variably subnetted, 5 subnets, 4 masks
+C       192.168.100.0/26 is directly connected, GigabitEthernet0/1
+L       192.168.100.1/32 is directly connected, GigabitEthernet0/1
+S       192.168.100.64/27 [1/0] via 192.168.100.98
+C       192.168.100.96/30 is directly connected, GigabitEthernet0/0
+L       192.168.100.97/32 is directly connected, GigabitEthernet0/0</code></pre>
+            </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="verif-step">
+            <div class="verif-title">
+                <span>3. End-to-End Ping Test (Host to Host)</span>
+            </div>
+            <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 6px;">From <strong>PC-Sales</strong>, send 4 ICMP packets across the routed topology to <strong>PC-Eng</strong>:</p>
+            <div class="code-block">
+                <pre><code>PC-Sales:~$ ping -c 4 192.168.100.70
+PING 192.168.100.70 (192.168.100.70): 56 data bytes
+64 bytes from 192.168.100.70: seq=0 ttl=62 time=3.12 ms
+64 bytes from 192.168.100.70: seq=1 ttl=62 time=2.45 ms
+64 bytes from 192.168.100.70: seq=2 ttl=62 time=2.18 ms
+64 bytes from 192.168.100.70: seq=3 ttl=62 time=2.29 ms
+
+--- 192.168.100.70 ping statistics ---
+4 packets transmitted, 4 packets received, 0% packet loss</code></pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. COMPLETED CONFIGURATIONS & LAB COMMENTARY (SPOILER-FREE DRAWER) -->
+    <details class="card solution-drawer">
+        <summary>
+            <span>✅ Completed Configurations & Engineering Deep-Dive & Exam Pitfalls</span>
+            <span class="solution-badge">Click to Reveal</span>
+        </summary>
+        <div class="solution-content" style="margin-top: 18px;">
+            <p style="color: var(--text-muted); font-size: 0.9rem;">
+                Review the completed device configurations, copy Cisco IOS syntax to your clipboard, and read the in-depth lab commentary.
+            </p>
+
+            <!-- Tab Controls -->
+            <div class="tabs-header">
+                <button class="tab-btn active" onclick="showTab('tab-r1', this)">Router 1 (R1)</button>
+                <button class="tab-btn" onclick="showTab('tab-r2', this)">Router 2 (R2)</button>
+                <button class="tab-btn" onclick="showTab('tab-hosts', this)">PC Endpoints</button>
+                <button class="tab-btn" onclick="showTab('tab-commentary', this)">🎓 Engineering Deep-Dive & Exam Pitfalls</button>
+            </div>
+
+            <!-- Tab 1: R1 -->
+            <div class="tab-pane active" id="tab-r1">
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy R1 Config</button>
+                    <pre><code>enable
+configure terminal
+hostname R1
+!
+interface GigabitEthernet0/0
+ description WAN Point-to-Point Link to R2
+ ip address 192.168.100.97 255.255.255.252
+ no shutdown
+!
+interface GigabitEthernet0/1
+ description Sales Department LAN Gateway
+ ip address 192.168.100.1 255.255.255.192
+ no shutdown
+!
+! Static route to Engineering LAN via R2 WAN IP
+ip route 192.168.100.64 255.255.255.224 192.168.100.98
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+!
+end
+write memory</code></pre>
+                </div>
+            </div>
+
+            <!-- Tab 2: R2 -->
+            <div class="tab-pane" id="tab-r2">
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy R2 Config</button>
+                    <pre><code>enable
+configure terminal
+hostname R2
+!
+interface GigabitEthernet0/0
+ description WAN Point-to-Point Link to R1
+ ip address 192.168.100.98 255.255.255.252
+ no shutdown
+!
+interface GigabitEthernet0/1
+ description Engineering Department LAN Gateway
+ ip address 192.168.100.65 255.255.255.224
+ no shutdown
+!
+! Static route to Sales LAN via R1 WAN IP
+ip route 192.168.100.0 255.255.255.192 192.168.100.97
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+!
+end
+write memory</code></pre>
+                </div>
+            </div>
+
+            <!-- Tab 3: Hosts -->
+            <div class="tab-pane" id="tab-hosts">
+                <p style="font-size: 0.85rem; color: var(--text-muted);">Alpine Linux Endpoint CLI Commands:</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy Host Configs</button>
+                    <pre><code># PC-Sales Configuration:
+ip addr add 192.168.100.10/26 dev eth0
+ip link set eth0 up
+ip route add default via 192.168.100.1
+
+# PC-Eng Configuration:
+ip addr add 192.168.100.70/27 dev eth0
+ip link set eth0 up
+ip route add default via 192.168.100.65</code></pre>
+                </div>
+            </div>
+
+            <!-- Tab 4: Engineering Deep-Dive & Exam Pitfalls -->
+            <div class="tab-pane" id="tab-commentary">
+                <div class="commentary-section">
+                    <h4>🔬 Architectural Breakdown & Design Logic</h4>
+                    <p>
+                        This lab reinforces core Volume 1 Chapter 9 skills: converting prefix lengths to dotted-decimal notation in Cisco IOS, assigning interface addresses, building static routing tables, and tracing end-to-end packet paths. Here is the engineering logic behind each requirement group:
+                    </p>
+                </div>
+
+                <div class="commentary-section">
+                    <h4>1. Dotted-Decimal Masks in Cisco IOS vs. CIDR</h4>
+                    <p>
+                        While modern documentation and network planners use CIDR prefixes like <code>/26</code>, <code>/27</code>, and <code>/30</code>, Cisco IOS interface and static route configuration commands require <strong>dotted-decimal subnet masks</strong>:
+                    </p>
+                    <ul>
+                        <li><strong>/26 (Sales LAN)</strong>: 26 mask bits &rarr; <code>255.255.255.192</code> (64 total IPs, 62 usable hosts).</li>
+                        <li><strong>/27 (Engineering LAN)</strong>: 27 mask bits &rarr; <code>255.255.255.224</code> (32 total IPs, 30 usable hosts).</li>
+                        <li><strong>/30 (WAN Interconnect)</strong>: 30 mask bits &rarr; <code>255.255.255.252</code> (4 total IPs, 2 usable host IPs).</li>
+                    </ul>
+                    <p>
+                        Entering <code>ip address 192.168.100.1/26</code> directly on a Cisco IOS interface will trigger an invalid input syntax error—you must always convert to dotted decimal.
+                    </p>
+                </div>
+
+                <div class="commentary-section">
+                    <h4>2. Static Routing: Next-Hop IP vs. Outgoing Interface</h4>
+                    <p>
+                        In Cisco IOS, an IPv4 static route is defined using <code>ip route &lt;dest-subnet&gt; &lt;dest-mask&gt; &lt;next-hop-ip | exit-interface&gt;</code>.
+                    </p>
+                    <p>
+                        On point-to-point serial links, specifying either the outgoing interface or next-hop IP produces the same result. However, on <strong>Ethernet links</strong> (such as GigabitEthernet0/0 in this lab), specifying only the exit interface forces the router to broadcast an ARP request for every single destination host address it routes, exhausting router ARP cache memory and causing performance degradation (Proxy ARP dependency). <strong>Best practice is to always specify the next-hop IPv4 address</strong> (<code>192.168.100.98</code> on R1, and <code>192.168.100.97</code> on R2).
+                    </p>
+                </div>
+
+                <div class="commentary-section">
+                    <h4>3. The "Return Routing" Trap (Asymmetric Failure)</h4>
+                    <p>
+                        A very common exam and real-world trap occurs when an engineer configures the forward static route on R1 (allowing PC-Sales to send packets to PC-Eng), but forgets the return route on R2.
+                    </p>
+                    <p>
+                        When PC-Sales pings PC-Eng, the ICMP Echo Request arrives successfully at PC-Eng. But when PC-Eng generates an ICMP Echo Reply destined for <code>192.168.100.10</code>, Router 2 consults its routing table, finds no route matching <code>192.168.100.0/26</code>, and immediately drops the packet! <strong>Always verify both forward and return path routing tables.</strong>
+                    </p>
+                </div>
+
+                <div class="commentary-section">
+                    <h4>4. Connected (C) vs. Local (L) Routing Table Entries</h4>
+                    <p>
+                        When viewing <code>show ip route</code> on Cisco IOS 15+, notice two distinct route types for each enabled interface:
+                    </p>
+                    <ul>
+                        <li><code>C (Connected)</code>: Represents the entire subnet attached to the interface (e.g., <code>192.168.100.0/26</code>). Used for forwarding traffic to other hosts in that subnet.</li>
+                        <li><code>L (Local)</code>: Represents the router's own specific interface IP with a <code>/32</code> host mask (e.g., <code>192.168.100.1/32</code>). Used by the router's internal CPU to quickly determine whether an incoming packet is destined for the router itself.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </details>
+
+</div>
+
+<script>
+    // 1-Click Copy Function
+    function copyCode(btn) {
+        const pre = btn.nextElementSibling;
+        navigator.clipboard.writeText(pre.innerText).then(() => {
+            const originalText = btn.innerText;
+            btn.innerText = 'Copied!';
+            btn.style.background = '#10b981';
+            btn.style.borderColor = '#10b981';
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.style.background = '#223049';
+                btn.style.borderColor = '#334155';
+            }, 2000);
+        });
+    }
+
+    // Solution Tabs Switcher
+    function showTab(tabId, btn) {
+        document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        btn.classList.add('active');
+    }
+</script>
+
+</body>
+</html>

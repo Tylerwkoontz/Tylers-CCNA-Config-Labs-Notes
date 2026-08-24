@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab 01: TCP/IP Protocol Architecture & Header Encapsulation | Tyler's CCNA Lab Hub</title>
+    <style>
+        :root {
+            --bg-body: #0b0f19;
+            --bg-card: #151e2e;
+            --bg-inner: #0f172a;
+            --bg-code: #070a12;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-blue: #0284c7;
+            --accent-cyan: #38bdf8;
+            --accent-green: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-purple: #8b5cf6;
+            --border-color: #223049;
+            --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        }
+
+        body {
+            margin: 0;
+            padding: 32px 20px;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: var(--font);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1040px;
+            margin: 0 auto;
+        }
+
+        .top-nav {
+            margin-bottom: 20px;
+        }
+        .top-nav a {
+            color: var(--accent-cyan);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        .top-nav a:hover { text-decoration: underline; }
+
+        .lab-header {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 24px 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.4);
+        }
+
+        .badge-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-blue   { background: #0369a1; color: #e0f2fe; }
+        .badge-purple { background: #581c87; color: #f3e8ff; }
+        .badge-amber  { background: #b45309; color: #fef3c7; }
+        .badge-green  { background: #047857; color: #d1fae5; }
+
+        h1 { margin: 0 0 10px 0; font-size: 1.85rem; color: #ffffff; letter-spacing: -0.5px; }
+        h2 { font-size: 1.25rem; color: var(--accent-cyan); margin: 0 0 16px 0; display: flex; align-items: center; gap: 8px; }
+        h3 { font-size: 1.05rem; color: #ffffff; margin: 18px 0 10px 0; }
+        p { margin: 0 0 12px 0; }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .topology-svg {
+            width: 100%;
+            height: auto;
+            max-height: 200px;
+            background: var(--bg-code);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin: 14px 0 6px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            font-size: 0.88rem;
+        }
+
+        th, td {
+            padding: 10px 14px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--bg-inner);
+            color: var(--accent-cyan);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.78rem;
+            letter-spacing: 0.5px;
+        }
+
+        tr:hover { background-color: rgba(255, 255, 255, 0.02); }
+
+        .baseline-box {
+            background: var(--bg-inner);
+            border-left: 4px solid var(--accent-amber);
+            border-radius: 6px;
+            padding: 14px 18px;
+            margin: 16px 0 0 0;
+            font-size: 0.9rem;
+        }
+        .baseline-box strong { color: var(--accent-amber); }
+
+        .req-group {
+            margin-bottom: 22px;
+        }
+        .req-group:last-child {
+            margin-bottom: 0;
+        }
+        .req-group h3 {
+            font-size: 1.05rem;
+            color: var(--accent-cyan);
+            margin: 0 0 10px 0;
+            font-weight: 700;
+        }
+        .clean-list {
+            margin: 0;
+            padding-left: 24px;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+        .clean-list li {
+            margin-bottom: 8px;
+        }
+        .clean-list li:last-child {
+            margin-bottom: 0;
+        }
+        .clean-list strong {
+            color: #ffffff;
+        }
+
+        .verif-step {
+            background: var(--bg-inner);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 14px;
+        }
+
+        .verif-title {
+            font-weight: 700;
+            color: #ffffff;
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .code-block {
+            position: relative;
+            margin: 10px 0 0 0;
+        }
+
+        pre {
+            background-color: var(--bg-code);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 14px 16px;
+            overflow-x: auto;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: #e2e8f0;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #223049;
+            color: #f8fafc;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            padding: 5px 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover { background: var(--accent-blue); border-color: var(--accent-blue); }
+
+        details.solution-drawer {
+            border-top: 4px solid var(--accent-green);
+            cursor: default;
+        }
+
+        details.solution-drawer summary {
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            user-select: none;
+            padding: 4px 0;
+        }
+
+        details.solution-drawer summary::-webkit-details-marker {
+            display: none;
+        }
+
+        details.solution-drawer summary:hover {
+            color: #ffffff;
+        }
+
+        .solution-badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            background: #1e293b;
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            transition: all 0.2s;
+        }
+
+        details[open].solution-drawer .solution-badge {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--accent-green);
+            border-color: var(--accent-green);
+        }
+
+        .tabs-header {
+            display: flex;
+            gap: 8px;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 16px;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 10px 18px;
+            font-size: 0.92rem;
+            font-weight: 700;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover { color: #ffffff; }
+        .tab-btn.active {
+            color: var(--accent-cyan);
+            border-bottom-color: var(--accent-cyan);
+        }
+
+        .tab-pane { display: none; }
+        .tab-pane.active { display: block; }
+
+        .commentary-section {
+            background: var(--bg-inner);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 18px 20px;
+            margin-bottom: 16px;
+            font-size: 0.92rem;
+        }
+        .commentary-section h4 {
+            margin: 0 0 8px 0;
+            color: var(--accent-amber);
+            font-size: 1rem;
+        }
+        .commentary-section p { margin-bottom: 10px; }
+        .commentary-section p:last-child { margin-bottom: 0; }
+        .commentary-section code {
+            background: var(--bg-code);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: var(--accent-cyan);
+            font-family: var(--font-mono);
+            font-size: 0.85em;
+        }
+
+        @media print {
+            body { background: #ffffff; color: #000000; padding: 0; }
+            .lab-header, .card, .verif-step, .commentary-section, .baseline-box { border: 1px solid #ccc; box-shadow: none; background: #ffffff; color: #000000; }
+            h1, h2, h3, .verif-title, details.solution-drawer summary { color: #000000 !important; }
+            pre { background: #f8f9fa; color: #000000; border: 1px solid #ddd; }
+            .copy-btn, .top-nav, .solution-badge { display: none !important; }
+            details.solution-drawer { display: block !important; }
+            details.solution-drawer .solution-content { display: block !important; margin-top: 0 !important; }
+            .tab-pane { display: block !important; margin-bottom: 20px; }
+            .tabs-header { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Top Navigation Breadcrumb -->
+    <div class="top-nav">
+        <a href="../index.html">&larr; Back to Master Dashboard</a>
+    </div>
+
+    <!-- 1. HEADER & METADATA -->
+    <div class="lab-header">
+        <div class="badge-group">
+            <span class="badge badge-blue">CCNA 200-301 (Domains 1.1, 1.3 & 1.4)</span>
+            <span class="badge badge-purple">CertSkills Config Lab #01</span>
+            <span class="badge badge-amber">Fundamental</span>
+            <span class="badge badge-green">Est: 25 Mins</span>
+        </div>
+        <h1>Lab 01: TCP/IP Protocol Architecture & Header Encapsulation</h1>
+        <p style="color: var(--text-muted); margin: 0;">
+            <strong>Curriculum Focus:</strong> Cisco Press Official Cert Guide Vol 1, Part I (Chapters 1 & 2) • <strong>Topics:</strong> OSI vs TCP/IP Models, Protocol Data Units (PDUs), Layer 4 TCP 3-Way Handshake & Port Multiplexing, Layer 3 IPv4 Headers, and Layer 2 Ethernet II Frame Encapsulation.
+        </p>
+    </div>
+
+    <!-- 2. TOPOLOGY, PROTOCOL ARCHITECTURE & INITIAL STATE -->
+    <div class="card">
+        <h2>🗺️ Topology, Protocol Model & Initial State</h2>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">
+            <strong>Scenario:</strong> You are analyzing a web client session between an engineering workstation (<code>PC-Client</code>) and an enterprise HTTP web server (<code>Web-Server</code>). You must trace how data is encapsulated from the Application layer down to physical Layer 1 bits, inspect transport layer port multiplexing, and analyze header fields at each tier of the TCP/IP stack.
+        </p>
+
+        <!-- Hierarchical Vector SVG Diagram -->
+        <svg class="topology-svg" viewBox="0 0 800 240" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                    <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#1e293b" stroke-width="0.5"/>
+                </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grid)" />
+
+            <!-- Tier Background Bands -->
+            <rect x="20" y="15" width="760" height="90" rx="6" fill="#1e293b" fill-opacity="0.3" stroke="#334155" stroke-dasharray="4,4"/>
+            <text x="35" y="32" fill="#38bdf8" font-size="10" font-weight="bold" letter-spacing="1">🏢 SERVER & SERVICE TIER</text>
+
+            <rect x="20" y="130" width="760" height="95" rx="6" fill="#1e293b" fill-opacity="0.3" stroke="#334155" stroke-dasharray="4,4"/>
+            <text x="35" y="147" fill="#10b981" font-size="10" font-weight="bold" letter-spacing="1">💻 CLIENT & ACCESS TIER</text>
+
+            <!-- Vertical Connection -->
+            <line x1="400" y1="90" x2="400" y2="155" stroke="#38bdf8" stroke-width="3" />
+
+            <!-- Protocol Badge -->
+            <rect x="420" y="105" width="115" height="24" rx="4" fill="#0369a1"/>
+            <text x="477" y="121" fill="#ffffff" font-size="9" font-weight="bold" text-anchor="middle">HTTP :80 / TCP Handshake</text>
+
+            <!-- Web-Server (Top) -->
+            <rect x="330" y="38" width="140" height="52" rx="8" fill="#151e2e" stroke="#10b981" stroke-width="2"/>
+            <text x="400" y="60" fill="#10b981" font-size="13" font-weight="bold" text-anchor="middle">Web-Server</text>
+            <text x="400" y="78" fill="#94a3b8" font-size="9" text-anchor="middle">10.1.1.100/24 (TCP:80)</text>
+            <text x="410" y="98" fill="#10b981" font-size="9">eth0</text>
+
+            <!-- PC-Client (Bottom) -->
+            <circle cx="400" cy="180" r="26" fill="#151e2e" stroke="#38bdf8" stroke-width="2"/>
+            <text x="400" y="184" fill="#f8fafc" font-size="11" font-weight="bold" text-anchor="middle">PC-Client</text>
+            <text x="400" y="218" fill="#94a3b8" font-size="9" text-anchor="middle">10.1.1.10/24 (MAC: 5000.0001.0001)</text>
+            <text x="410" y="152" fill="#38bdf8" font-size="9">eth0</text>
+        </svg>
+
+        <!-- Protocol Model Comparison Table -->
+        <table>
+            <thead>
+                <tr>
+                    <th>OSI 7-Layer Model</th>
+                    <th>TCP/IP 5-Layer Model</th>
+                    <th>PDU Terminology</th>
+                    <th>Core Encapsulation Header Fields</th>
+                    <th>Key Protocols</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Layers 7, 6, 5</strong> (App/Pres/Sess)</td>
+                    <td><strong>Application</strong></td>
+                    <td><strong>Data</strong></td>
+                    <td>Application Payload / Request-Response Data</td>
+                    <td>HTTP, HTTPS, SSH, DNS, Telnet, DHCP</td>
+                </tr>
+                <tr>
+                    <td><strong>Layer 4</strong> (Transport)</td>
+                    <td><strong>Transport</strong></td>
+                    <td><strong>Segment</strong> (TCP) / <strong>Datagram</strong> (UDP)</td>
+                    <td>Source Port, Destination Port, Seq/Ack, Control Flags</td>
+                    <td>TCP (Reliable, Conn-Oriented), UDP</td>
+                </tr>
+                <tr>
+                    <td><strong>Layer 3</strong> (Network)</td>
+                    <td><strong>Internet (Network)</strong></td>
+                    <td><strong>Packet</strong></td>
+                    <td>Source IP, Destination IP, TTL, Protocol ID (6=TCP, 17=UDP)</td>
+                    <td>IPv4, IPv6, ICMP, ARP (L2/L3 boundary)</td>
+                </tr>
+                <tr>
+                    <td><strong>Layer 2</strong> (Data Link)</td>
+                    <td><strong>Data Link</strong></td>
+                    <td><strong>Frame</strong></td>
+                    <td>Source MAC, Destination MAC, EtherType, FCS Trailer</td>
+                    <td>Ethernet (802.3), 802.11 Wi-Fi, HDLC, PPP</td>
+                </tr>
+                <tr>
+                    <td><strong>Layer 1</strong> (Physical)</td>
+                    <td><strong>Physical</strong></td>
+                    <td><strong>Bits</strong></td>
+                    <td>Encoding, Voltage Levels, Optical Pulses, Connectors</td>
+                    <td>RJ-45, Cat6 UTP, Multi-Mode Fiber, SFP</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Initial Device State -->
+        <div class="baseline-box">
+            <strong>Initial Baseline State:</strong> Host PC-Client (<code>10.1.1.10/24</code>) and Web-Server (<code>10.1.1.100/24</code>) are directly connected in VLAN 1. Web-Server has an active HTTP daemon listening on TCP port 80.
+        </div>
+    </div>
+
+    <!-- 3. ENGINEERING REQUIREMENTS SPECIFICATION -->
+    <div class="card">
+        <h2>📋 Engineering Requirements</h2>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">
+            Trace and analyze protocol encapsulation fields across the client-server interaction.
+        </p>
+
+        <div class="req-group">
+            <h3>1. End-to-End Addressing & Service Verification:</h3>
+            <ul class="clean-list">
+                <li>Verify IP configuration on <strong>PC-Client</strong> (<code>10.1.1.10/24</code>) and <strong>Web-Server</strong> (<code>10.1.1.100/24</code>).</li>
+                <li>Confirm that the web service on <strong>Web-Server</strong> is actively listening on TCP port <strong>80</strong>.</li>
+            </ul>
+        </div>
+
+        <div class="req-group">
+            <h3>2. Layer 4 Transport Multiplexing & TCP 3-Way Handshake:</h3>
+            <ul class="clean-list">
+                <li>From <strong>PC-Client</strong>, initiate an HTTP GET request to <code>http://10.1.1.100/</code>.</li>
+                <li>Capture and analyze the 3 packets of the TCP connection establishment handshake:
+                    <ul>
+                        <li><strong>Packet 1 (SYN)</strong>: Client sends <code>SYN=1</code>, initial client sequence number (ISN), destination port 80, and a dynamic ephemeral source port (&ge; 49152).</li>
+                        <li><strong>Packet 2 (SYN-ACK)</strong>: Server responds with <code>SYN=1</code>, <code>ACK=1</code>, server ISN, and acknowledgment number = Client ISN + 1.</li>
+                        <li><strong>Packet 3 (ACK)</strong>: Client completes handshake with <code>ACK=1</code> and acknowledgment number = Server ISN + 1.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <div class="req-group">
+            <h3>3. Layer 3 IPv4 Header Analysis:</h3>
+            <ul class="clean-list">
+                <li>Inspect the IPv4 packet header of the HTTP data packet:
+                    <ul>
+                        <li>Confirm <strong>Version</strong> is <code>4</code> and Internet Header Length (<strong>IHL</strong>) is <code>5</code> (20 bytes).</li>
+                        <li>Verify <strong>Protocol ID</strong> is <code>6</code> (indicating TCP payload) rather than <code>17</code> (UDP) or <code>1</code> (ICMP).</li>
+                        <li>Verify that the <strong>Time-to-Live (TTL)</strong> starts at 64 on the originating Linux host.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <div class="req-group">
+            <h3>4. Layer 2 Ethernet II Frame Encapsulation & FCS:</h3>
+            <ul class="clean-list">
+                <li>Inspect the Ethernet frame carrying the packet:
+                    <ul>
+                        <li>Verify Destination MAC matches Web-Server MAC (<code>5000.0002.0002</code>).</li>
+                        <li>Verify Source MAC matches PC-Client MAC (<code>5000.0001.0001</code>).</li>
+                        <li>Verify <strong>Type</strong> field is <code>0x0800</code> (IPv4) rather than <code>0x0806</code> (ARP).</li>
+                        <li>Confirm the presence of the 4-byte <strong>Frame Check Sequence (FCS)</strong> trailer calculated via CRC-32.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 4. VERIFICATION & VALIDATION -->
+    <div class="card">
+        <h2>🔍 Verification & Validation Steps</h2>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">
+            Run these verification commands to view protocol socket states and capture live packet headers.
+        </p>
+
+        <!-- Step 1 -->
+        <div class="verif-step">
+            <div class="verif-title">
+                <span>1. Verify Listening Sockets on Web-Server</span>
+            </div>
+            <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 6px;">Check listening TCP ports on the server endpoint:</p>
+            <div class="code-block">
+                <pre><code>Web-Server:~$ ss -tuln
+Netid   State      Recv-Q   Send-Q     Local Address:Port     Peer Address:Port
+tcp     LISTEN     0        128              0.0.0.0:80            0.0.0.0:*</code></pre>
+            </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="verif-step">
+            <div class="verif-title">
+                <span>2. Trace TCP 3-Way Handshake & HTTP Request (tcpdump)</span>
+            </div>
+            <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 6px;">Capture and decode packets on PC-Client during HTTP curl command:</p>
+            <div class="code-block">
+                <pre><code>PC-Client:~$ tcpdump -nn -i eth0 port 80
+00:00:01.100 IP 10.1.1.10.51234 > 10.1.1.100.80: Flags [S], seq 1000000, win 64240
+00:00:01.102 IP 10.1.1.100.80 > 10.1.1.10.51234: Flags [S.], seq 2000000, ack 1000001, win 65160
+00:00:01.103 IP 10.1.1.10.51234 > 10.1.1.100.80: Flags [.], ack 2000001, win 64240
+00:00:01.105 IP 10.1.1.10.51234 > 10.1.1.100.80: Flags [P.], seq 1000001:1000085, ack 2000001: HTTP: GET / HTTP/1.1</code></pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. COMPLETED CONFIGURATIONS & LAB COMMENTARY (SPOILER-FREE DRAWER) -->
+    <details class="card solution-drawer">
+        <summary>
+            <span>✅ Completed Configurations & Engineering Deep-Dive & Exam Pitfalls</span>
+            <span class="solution-badge">Click to Reveal</span>
+        </summary>
+        <div class="solution-content" style="margin-top: 18px;">
+            <p style="color: var(--text-muted); font-size: 0.9rem;">
+                Review endpoint setup commands, 5-layer header byte map, and Cisco Press deep architectural commentary.
+            </p>
+
+            <!-- Tab Controls -->
+            <div class="tabs-header">
+                <button class="tab-btn active" onclick="showTab('tab-cmds', this)">Endpoint CLI Commands</button>
+                <button class="tab-btn" onclick="showTab('tab-bytemap', this)">🔬 5-Layer Encapsulation Byte Map</button>
+                <button class="tab-btn" onclick="showTab('tab-commentary', this)">🎓 Engineering Deep-Dive & Exam Pitfalls</button>
+            </div>
+
+            <!-- Tab 1: Commands -->
+            <div class="tab-pane active" id="tab-cmds">
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy Endpoint Commands</button>
+                    <pre><code># On Web-Server:
+ip addr add 10.1.1.100/24 dev eth0
+ip link set eth0 up
+# Start simple Python HTTP daemon on port 80:
+python3 -m http.server 80 &
+
+# On PC-Client:
+ip addr add 10.1.1.10/24 dev eth0
+ip link set eth0 up
+# Initiate HTTP GET request:
+curl -v http://10.1.1.100/</code></pre>
+                </div>
+            </div>
+
+            <!-- Tab 2: Byte Map -->
+            <div class="tab-pane" id="tab-bytemap">
+                <h4>🔬 Full De-encapsulation Anatomy of an HTTP Frame</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Layer</th>
+                            <th>PDU Tier</th>
+                            <th>Header Name</th>
+                            <th>Field Values for this Lab</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>L7</strong></td>
+                            <td>Application Data</td>
+                            <td>HTTP Payload</td>
+                            <td><code>GET / HTTP/1.1
+Host: 10.1.1.100
+
+</code></td>
+                        </tr>
+                        <tr>
+                            <td><strong>L4</strong></td>
+                            <td>TCP Segment</td>
+                            <td>TCP Header (20B)</td>
+                            <td>Src Port: <code>51234</code> (Ephemeral) | Dst Port: <code>80</code> (HTTP) | Flags: <code>[P.]</code></td>
+                        </tr>
+                        <tr>
+                            <td><strong>L3</strong></td>
+                            <td>IPv4 Packet</td>
+                            <td>IP Header (20B)</td>
+                            <td>Src IP: <code>10.1.1.10</code> | Dst IP: <code>10.1.1.100</code> | Protocol: <code>6 (TCP)</code> | TTL: <code>64</code></td>
+                        </tr>
+                        <tr>
+                            <td><strong>L2</strong></td>
+                            <td>Ethernet Frame</td>
+                            <td>Ethernet II (14B Header + 4B Trailer)</td>
+                            <td>Src MAC: <code>5000.0001.0001</code> | Dst MAC: <code>5000.0002.0002</code> | Type: <code>0x0800</code> | FCS</td>
+                        </tr>
+                        <tr>
+                            <td><strong>L1</strong></td>
+                            <td>Physical Bits</td>
+                            <td>1000BASE-T</td>
+                            <td>Manchester / PAM-5 encoded electrical voltage transitions on UTP Cat6</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Tab 3: Commentary -->
+            <div class="tab-pane" id="tab-commentary">
+                <div class="commentary-section">
+                    <h4>🔬 Architectural Breakdown & Design Logic</h4>
+                    <p>
+                        This lab deconstructs the core theoretical foundation of the entire CCNA exam: data encapsulation and protocol communication, as presented in Cisco Press Volume 1, Chapters 1 & 2.
+                    </p>
+                </div>
+
+                <div class="commentary-section">
+                    <h4>1. Same-Layer vs. Adjacent-Layer Interaction</h4>
+                    <p>
+                        Cisco Press highlights two fundamental rules of networking communication:
+                    </p>
+                    <ul>
+                        <li><strong>Adjacent-Layer Interaction (On the Same Host)</strong>: How a higher layer requests services from the layer directly below it (e.g., HTTP on PC-Client requests reliable transport from TCP; TCP hands segments down to IP).</li>
+                        <li><strong>Same-Layer Interaction (Across the Network)</strong>: How the protocol on one device communicates with the corresponding protocol on the destination device using header information (e.g., TCP on PC-Client talks to TCP on Web-Server using Sequence and Acknowledgment numbers in the TCP header).</li>
+                    </ul>
+                </div>
+
+                <div class="commentary-section">
+                    <h4>2. Port Number Ranges & Port Multiplexing</h4>
+                    <p>
+                        Layer 4 ports enable a host to run multiple network applications simultaneously over a single IP address:
+                    </p>
+                    <ul>
+                        <li><strong>Well-Known Ports (0 – 1023)</strong>: Reserved for server-side daemons (e.g. <code>22</code> SSH, <code>23</code> Telnet, <code>53</code> DNS, <code>80</code> HTTP, <code>443</code> HTTPS).</li>
+                        <li><strong>Registered Ports (1024 – 49151)</strong>: Vendor-specific application services.</li>
+                        <li><strong>Dynamic / Private / Ephemeral Ports (49152 – 65535)</strong>: Randomly assigned by the client OS to track individual outgoing client connections.</li>
+                    </ul>
+                </div>
+
+                <div class="commentary-section">
+                    <h4>3. The Role of the EtherType Field</h4>
+                    <p>
+                        The 2-byte <strong>Type</strong> field in the Ethernet II frame header identifies which Layer 3 protocol is encapsulated in the data payload:
+                    </p>
+                    <ul>
+                        <li><code>0x0800</code> = IPv4 Packet</li>
+                        <li><code>0x0806</code> = ARP (Address Resolution Protocol)</li>
+                        <li><code>0x86DD</code> = IPv6 Packet</li>
+                        <li><code>0x8100</code> = 802.1Q VLAN Tagged Frame</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </details>
+
+</div>
+
+<script>
+    // 1-Click Copy Function
+    function copyCode(btn) {
+        const pre = btn.nextElementSibling;
+        navigator.clipboard.writeText(pre.innerText).then(() => {
+            const originalText = btn.innerText;
+            btn.innerText = "Copied!";
+            btn.style.background = "#10b981";
+            btn.style.borderColor = "#10b981";
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.style.background = "#223049";
+                btn.style.borderColor = "#334155";
+            }, 2000);
+        });
+    }
+
+    // Solution Tabs Switcher
+    function showTab(tabId, btn) {
+        document.querySelectorAll(".tab-pane").forEach(pane => pane.classList.remove("active"));
+        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+        document.getElementById(tabId).classList.add("active");
+        btn.classList.add("active");
+    }
+</script>
+
+</body>
+</html>

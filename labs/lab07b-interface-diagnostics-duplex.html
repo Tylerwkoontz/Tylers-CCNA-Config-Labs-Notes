@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab 07B: Layer 1/2 Switch Interface Diagnostics | Tyler's CCNA Lab Hub</title>
+    <style>
+        :root {
+            --bg-body: #0b0f19;
+            --bg-card: #151e2e;
+            --bg-inner: #0f172a;
+            --bg-code: #070a12;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-blue: #0284c7;
+            --accent-cyan: #38bdf8;
+            --accent-green: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-purple: #8b5cf6;
+            --border-color: #223049;
+            --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        }
+
+        body {
+            margin: 0;
+            padding: 32px 20px;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: var(--font);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1040px;
+            margin: 0 auto;
+        }
+
+        .top-nav {
+            margin-bottom: 20px;
+        }
+        .top-nav a {
+            color: var(--accent-cyan);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        .top-nav a:hover { text-decoration: underline; }
+
+        .lab-header {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 24px 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.4);
+        }
+
+        .badge-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-blue   { background: #0369a1; color: #e0f2fe; }
+        .badge-purple { background: #581c87; color: #f3e8ff; }
+        .badge-amber  { background: #b45309; color: #fef3c7; }
+        .badge-green  { background: #047857; color: #d1fae5; }
+
+        h1 { margin: 0 0 10px 0; font-size: 1.85rem; color: #ffffff; letter-spacing: -0.5px; }
+        h2 { font-size: 1.25rem; color: var(--accent-cyan); margin: 0 0 16px 0; display: flex; align-items: center; gap: 8px; }
+        h3 { font-size: 1.05rem; color: #ffffff; margin: 18px 0 10px 0; }
+        p { margin: 0 0 12px 0; }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .topology-svg {
+            width: 100%;
+            height: auto;
+            max-height: 220px;
+            background: var(--bg-code);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin: 14px 0 6px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            font-size: 0.88rem;
+        }
+
+        th, td {
+            padding: 10px 14px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--bg-inner);
+            color: var(--accent-cyan);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.78rem;
+            letter-spacing: 0.5px;
+        }
+
+        tr:hover { background-color: rgba(255, 255, 255, 0.02); }
+
+        .baseline-box {
+            background: var(--bg-inner);
+            border-left: 4px solid var(--accent-amber);
+            border-radius: 6px;
+            padding: 14px 18px;
+            margin: 16px 0 0 0;
+            font-size: 0.9rem;
+        }
+        .baseline-box strong { color: var(--accent-amber); }
+
+        .req-group {
+            margin-bottom: 22px;
+        }
+        .req-group:last-child {
+            margin-bottom: 0;
+        }
+        .req-group h3 {
+            font-size: 1.05rem;
+            color: var(--accent-cyan);
+            margin: 0 0 10px 0;
+            font-weight: 700;
+        }
+        .clean-list {
+            margin: 0;
+            padding-left: 24px;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+        .clean-list li {
+            margin-bottom: 8px;
+        }
+        .clean-list li:last-child {
+            margin-bottom: 0;
+        }
+        .clean-list strong {
+            color: #ffffff;
+        }
+
+        .verif-step {
+            background: var(--bg-inner);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 14px;
+        }
+
+        .verif-title {
+            font-weight: 700;
+            color: #ffffff;
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .code-block {
+            position: relative;
+            margin: 10px 0 0 0;
+        }
+
+        pre {
+            background-color: var(--bg-code);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 14px 16px;
+            overflow-x: auto;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: #e2e8f0;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #223049;
+            color: #f8fafc;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            padding: 5px 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover { background: var(--accent-blue); border-color: var(--accent-blue); }
+
+        details.solution-drawer {
+            border-top: 4px solid var(--accent-green);
+            cursor: default;
+        }
+
+        details.solution-drawer summary {
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            user-select: none;
+            padding: 4px 0;
+        }
+
+        details.solution-drawer summary::-webkit-details-marker {
+            display: none;
+        }
+
+        details.solution-drawer summary:hover {
+            color: #ffffff;
+        }
+
+        .solution-badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            background: #1e293b;
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            transition: all 0.2s;
+        }
+
+        details[open].solution-drawer .solution-badge {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--accent-green);
+            border-color: var(--accent-green);
+        }
+
+        .tabs-header {
+            display: flex;
+            gap: 8px;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 16px;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 10px 18px;
+            font-size: 0.92rem;
+            font-weight: 700;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover { color: #ffffff; }
+        .tab-btn.active {
+            color: var(--accent-cyan);
+            border-bottom-color: var(--accent-cyan);
+        }
+
+        .tab-pane { display: none; }
+        .tab-pane.active { display: block; }
+
+        .commentary-section {
+            background: var(--bg-inner);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 18px 20px;
+            margin-bottom: 16px;
+            font-size: 0.92rem;
+        }
+        .commentary-section h4 {
+            margin: 0 0 8px 0;
+            color: var(--accent-amber);
+            font-size: 1rem;
+        }
+        .commentary-section p { margin-bottom: 10px; }
+        .commentary-section p:last-child { margin-bottom: 0; }
+        .commentary-section code {
+            background: var(--bg-code);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: var(--accent-cyan);
+            font-family: var(--font-mono);
+            font-size: 0.85em;
+        }
+
+        @media print {
+            body { background: #ffffff; color: #000000; padding: 0; }
+            .lab-header, .card, .verif-step, .commentary-section, .baseline-box { border: 1px solid #ccc; box-shadow: none; background: #ffffff; color: #000000; }
+            h1, h2, h3, .verif-title, details.solution-drawer summary { color: #000000 !important; }
+            pre { background: #f8f9fa; color: #000000; border: 1px solid #ddd; }
+            .copy-btn, .top-nav, .solution-badge { display: none !important; }
+            details.solution-drawer { display: block !important; }
+            details.solution-drawer .solution-content { display: block !important; margin-top: 0 !important; }
+            .tab-pane { display: block !important; margin-bottom: 20px; }
+            .tabs-header { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Top Navigation Breadcrumb -->
+    <div class="top-nav">
+        <a href="../index.html">&larr; Back to Master Dashboard</a>
+    </div>
+
+    <!-- 1. HEADER & METADATA -->
+    <div class="lab-header">
+        <div class="badge-group">
+            <span class="badge badge-blue">CCNA 200-301 (Domains 1.1, 2.1 & 2.4)</span>
+            <span class="badge badge-purple">CertSkills Config Lab #07B</span>
+            <span class="badge badge-amber">Troubleshooting</span>
+            <span class="badge badge-green">Est: 30 Mins</span>
+        </div>
+        <h1>Lab 07B: Layer 1/2 Switch Interface Diagnostics & Duplex Mismatch Isolation</h1>
+        <p style="color: var(--text-muted); margin: 0;">
+            <strong>Curriculum Focus:</strong> Cisco Press Official Cert Guide Vol 1, Part II (Chapters 5 & 7) • <strong>Topics:</strong> Troubleshooting Interface Operational States, Autonegotiation Failure Diagnostics, Decoding `show interfaces` Error Counters (Late Collisions, CRC, Runts), and Remediation.
+        </p>
+    </div>
+
+    <!-- 2. TOPOLOGY, ADDRESSING & INITIAL STATE -->
+    <div class="card">
+        <h2>🗺️ Topology, Addressing & Initial State</h2>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">
+            <strong>Scenario:</strong> Users on <code>PC-A</code> report severe intermittent packet loss and sluggish throughput when accessing <code>Server-B</code>. You are tasked with analyzing the physical and data-link layers on switches <code>SW1</code> and <code>SW2</code>, isolating the root cause of late collisions and frame corruption, and restoring clean gigabit communication.
+        </p>
+
+        <!-- Hierarchical Vector SVG Diagram -->
+        <svg class="topology-svg" viewBox="0 0 800 240" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                    <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#1e293b" stroke-width="0.5"/>
+                </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grid)" />
+
+            <!-- Tier Background Bands -->
+            <rect x="20" y="15" width="760" height="95" rx="6" fill="#1e293b" fill-opacity="0.3" stroke="#334155" stroke-dasharray="4,4"/>
+            <text x="35" y="32" fill="#ef4444" font-size="10" font-weight="bold" letter-spacing="1">🏢 ACCESS SWITCHING TIER (INTER-SWITCH FAULT)</text>
+
+            <rect x="20" y="130" width="760" height="95" rx="6" fill="#1e293b" fill-opacity="0.3" stroke="#334155" stroke-dasharray="4,4"/>
+            <text x="35" y="147" fill="#38bdf8" font-size="10" font-weight="bold" letter-spacing="1">💻 WORKSTATION & SERVER TIER</text>
+
+            <!-- Faulty Inter-Switch Link -->
+            <line x1="310" y1="62" x2="490" y2="62" stroke="#ef4444" stroke-width="4" stroke-dasharray="6,4"/>
+            <rect x="330" y="48" width="140" height="24" rx="4" fill="#7f1d1d"/>
+            <text x="400" y="64" fill="#fca5a5" font-size="9" font-weight="bold" text-anchor="middle">⚠️ Duplex Mismatch (Full vs Half)</text>
+
+            <!-- Downlinks to Hosts -->
+            <line x1="260" y1="90" x2="260" y2="155" stroke="#38bdf8" stroke-width="3" />
+            <line x1="540" y1="90" x2="540" y2="155" stroke="#38bdf8" stroke-width="3" />
+
+            <!-- SW1 (Top Left) -->
+            <rect x="210" y="38" width="100" height="50" rx="8" fill="#151e2e" stroke="#10b981" stroke-width="2"/>
+            <text x="260" y="58" fill="#10b981" font-size="13" font-weight="bold" text-anchor="middle">SW1</text>
+            <text x="260" y="75" fill="#ef4444" font-size="8" font-weight="bold" text-anchor="middle">Gi0/1: 100/Full</text>
+            <text x="315" y="55" fill="#ef4444" font-size="9">Gi0/1</text>
+            <text x="265" y="110" fill="#38bdf8" font-size="9">Gi0/2</text>
+
+            <!-- SW2 (Top Right) -->
+            <rect x="490" y="38" width="100" height="50" rx="8" fill="#151e2e" stroke="#10b981" stroke-width="2"/>
+            <text x="540" y="58" fill="#10b981" font-size="13" font-weight="bold" text-anchor="middle">SW2</text>
+            <text x="540" y="75" fill="#ef4444" font-size="8" font-weight="bold" text-anchor="middle">Gi0/1: Auto (a-half)</text>
+            <text x="455" y="55" fill="#ef4444" font-size="9">Gi0/1</text>
+            <text x="545" y="110" fill="#38bdf8" font-size="9">Gi0/2</text>
+
+            <!-- PC-A (Bottom Left) -->
+            <circle cx="260" cy="180" r="26" fill="#151e2e" stroke="#38bdf8" stroke-width="2"/>
+            <text x="260" y="184" fill="#f8fafc" font-size="11" font-weight="bold" text-anchor="middle">PC-A</text>
+            <text x="260" y="218" fill="#94a3b8" font-size="8" text-anchor="middle">10.1.1.10/24 (Traffic Generator)</text>
+            <text x="265" y="150" fill="#38bdf8" font-size="9">eth0</text>
+
+            <!-- Server-B (Bottom Right) -->
+            <rect x="495" y="155" width="90" height="50" rx="8" fill="#151e2e" stroke="#38bdf8" stroke-width="2"/>
+            <text x="540" y="178" fill="#f8fafc" font-size="11" font-weight="bold" text-anchor="middle">Server-B</text>
+            <text x="540" y="196" fill="#94a3b8" font-size="8" text-anchor="middle">10.1.1.100/24</text>
+            <text x="545" y="150" fill="#38bdf8" font-size="9">eth0</text>
+        </svg>
+
+        <!-- Initial Device State -->
+        <div class="baseline-box">
+            <strong>Initial Baseline State:</strong> The inter-switch link between SW1 and SW2 has a misconfiguration: SW1 has <code>speed 100</code> and <code>duplex full</code> hardcoded on <code>Gi0/1</code>, while SW2 is configured with <code>speed auto</code> and <code>duplex auto</code>. A light ping passes, but bulk file transfers experience heavy CRC errors and packet drops.
+        </div>
+    </div>
+
+    <!-- 3. ENGINEERING REQUIREMENTS SPECIFICATION -->
+    <div class="card">
+        <h2>📋 Engineering Requirements</h2>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">
+            Isolate the physical/data-link fault, analyze interface error counters, and standardize interface configuration.
+        </p>
+
+        <div class="req-group">
+            <h3>1. Diagnose Operational State & Duplex Settings:</h3>
+            <ul class="clean-list">
+                <li>Execute <code>show interfaces status</code> on <strong>SW1</strong> and <strong>SW2</strong> to compare the duplex and speed columns for port <code>Gi0/1</code>.</li>
+                <li>Identify that SW1 displays <strong>full</strong> (hardcoded), while SW2 displays <strong>a-half</strong> (autonegotiated to half duplex via parallel detection).</li>
+            </ul>
+        </div>
+
+        <div class="req-group">
+            <h3>2. Analyze Interface Error Counters:</h3>
+            <ul class="clean-list">
+                <li>Generate 100 large ICMP ping packets from <strong>PC-A</strong> to <strong>Server-B</strong> (<code>ping -c 100 -s 1400 10.1.1.100</code>).</li>
+                <li>Execute <code>show interfaces gigabitEthernet 0/1</code> on both switches.</li>
+                <li>Observe and record the counter increments:
+                    <ul>
+                        <li>On <strong>SW2 (Half-Duplex Side)</strong>: Note the rise in <strong>late collisions</strong> (collisions occurring after the 64-byte slot time).</li>
+                        <li>On <strong>SW1 (Full-Duplex Side)</strong>: Note the rise in <strong>CRC errors</strong> and <strong>input errors</strong> (corrupted frames aborted by the half-duplex side).</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <div class="req-group">
+            <h3>3. Remediate & Standardize Speed/Duplex Configuration:</h3>
+            <ul class="clean-list">
+                <li>Remediate the inter-switch link by standardizing <code>GigabitEthernet0/1</code> on both SW1 and SW2 to <strong>speed 1000</strong> and <strong>duplex full</strong> (or dynamic autonegotiation on both ends).</li>
+                <li>Clear interface counters using <code>clear counters gigabitEthernet 0/1</code> on both switches.</li>
+                <li>Re-run the large packet ping test and verify <strong>0 late collisions, 0 CRC errors, and 0 packet drops</strong>.</li>
+            </ul>
+        </div>
+
+        <div class="req-group">
+            <h3>4. Configuration Persistence:</h3>
+            <ul class="clean-list">
+                <li>Save the active running configuration to startup NVRAM on both switches.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 4. VERIFICATION & VALIDATION -->
+    <div class="card">
+        <h2>🔍 Verification & Validation Steps</h2>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">
+            Run these verification commands to view error counter isolation and clean link state.
+        </p>
+
+        <!-- Step 1 -->
+        <div class="verif-step">
+            <div class="verif-title">
+                <span>1. Fault Signature in `show interfaces status`</span>
+            </div>
+            <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 6px;">Notice the classic `full` vs `a-half` duplex mismatch:</p>
+            <div class="code-block">
+                <pre><code>SW1# show interfaces status | include Gi0/1
+Gi0/1     Inter-Switch Link  connected    1            full    100 10/100/1000BaseTX
+
+SW2# show interfaces status | include Gi0/1
+Gi0/1     Inter-Switch Link  connected    1          a-half    100 10/100/1000BaseTX</code></pre>
+            </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="verif-step">
+            <div class="verif-title">
+                <span>2. Error Counters on SW2 (Late Collisions)</span>
+            </div>
+            <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 6px;">Check SW2 interface output under load:</p>
+            <div class="code-block">
+                <pre><code>SW2# show interfaces gigabitEthernet 0/1
+GigabitEthernet0/1 is up, line protocol is up (connected)
+  Half-duplex, 100Mb/s, media type is 10/100/1000BaseTX
+     450 packets input, 41200 bytes
+     48 input errors, 48 CRC, 0 frame, 0 overrun, 0 ignored
+     112 collisions, 64 late collisions</code></pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. COMPLETED CONFIGURATIONS & LAB COMMENTARY (SPOILER-FREE DRAWER) -->
+    <details class="card solution-drawer">
+        <summary>
+            <span>✅ Remediation Configurations & Engineering Deep-Dive & Exam Pitfalls</span>
+            <span class="solution-badge">Click to Reveal</span>
+        </summary>
+        <div class="solution-content" style="margin-top: 18px;">
+            <p style="color: var(--text-muted); font-size: 0.9rem;">
+                Review remediation switch configs, error counter diagnostic guide, and in-depth lab commentary.
+            </p>
+
+            <!-- Tab Controls -->
+            <div class="tabs-header">
+                <button class="tab-btn active" onclick="showTab('tab-remed', this)">Remediation Commands</button>
+                <button class="tab-btn" onclick="showTab('tab-counters', this)">🔬 Error Counter Diagnostic Guide</button>
+                <button class="tab-btn" onclick="showTab('tab-commentary', this)">🎓 Engineering Deep-Dive & Exam Pitfalls</button>
+            </div>
+
+            <!-- Tab 1: Remediation -->
+            <div class="tab-pane active" id="tab-remed">
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy Remediation Config</button>
+                    <pre><code>! On SW1 (Standardize to 1G Full):
+enable
+configure terminal
+interface GigabitEthernet0/1
+ speed 1000
+ duplex full
+ end
+clear counters gigabitEthernet0/1
+write memory
+
+! On SW2 (Match SW1 settings):
+enable
+configure terminal
+interface GigabitEthernet0/1
+ speed 1000
+ duplex full
+ end
+clear counters gigabitEthernet0/1
+write memory</code></pre>
+                </div>
+            </div>
+
+            <!-- Tab 2: Error Counter Guide -->
+            <div class="tab-pane" id="tab-counters">
+                <h4>🔬 Diagnostic Counter Interpretation</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Counter Name</th>
+                            <th>Definition</th>
+                            <th>Primary Root Cause</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Late Collisions</strong></td>
+                            <td>Collisions occurring after the first 64 bytes (512 bits) of transmission.</td>
+                            <td><strong>Duplex Mismatch</strong> (One side is Full Duplex and transmits while the other side is in Half Duplex). Also cable length > 100m.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>CRC Errors</strong></td>
+                            <td>Frame Check Sequence (FCS) calculation did not match incoming frame bits.</td>
+                            <td>Electrical EMI noise, damaged physical copper cable, faulty transceiver, or collision-induced frame corruption.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Runts</strong></td>
+                            <td>Frames received that are smaller than the minimum IEEE 64-byte size.</td>
+                            <td>Collisions aborting transmission early, or faulty network interface card.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Giants</strong></td>
+                            <td>Frames received that exceed the standard 1518-byte MTU size.</td>
+                            <td>Host sending baby-giant/jumbo frames (e.g. 9000 bytes) without switch jumbo MTU configuration.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Tab 3: Commentary -->
+            <div class="tab-pane" id="tab-commentary">
+                <div class="commentary-section">
+                    <h4>🔬 Architectural Breakdown & Design Logic</h4>
+                    <p>
+                        This lab covers the single most common real-world Ethernet troubleshooting scenario on the CCNA exam, as detailed in Cisco Press Volume 1, Chapter 7.
+                    </p>
+                </div>
+
+                <div class="commentary-section">
+                    <h4>1. Why Duplex Mismatches Still Pass `ping` Tests</h4>
+                    <p>
+                        A deceptive characteristic of a duplex mismatch is that single, small ICMP echo request packets (64 bytes) often succeed with 0% loss!
+                    </p>
+                    <p>
+                        Because traffic is light, the chances of both ends transmitting at the exact same millisecond are low. However, as soon as a user transfers a file (FTP, HTTP, backup) and packets flow bidirectionally simultaneously:
+                    </p>
+                    <ul>
+                        <li>The full-duplex side transmits continuously without checking for line availability.</li>
+                        <li>The half-duplex side senses the incoming electrical carrier while attempting to transmit its own frame, senses a collision, aborts, and logs a <strong>late collision</strong>!</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </details>
+
+</div>
+
+<script>
+    // 1-Click Copy Function
+    function copyCode(btn) {
+        const pre = btn.nextElementSibling;
+        navigator.clipboard.writeText(pre.innerText).then(() => {
+            const originalText = btn.innerText;
+            btn.innerText = "Copied!";
+            btn.style.background = "#10b981";
+            btn.style.borderColor = "#10b981";
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.style.background = "#223049";
+                btn.style.borderColor = "#334155";
+            }, 2000);
+        });
+    }
+
+    // Solution Tabs Switcher
+    function showTab(tabId, btn) {
+        document.querySelectorAll(".tab-pane").forEach(pane => pane.classList.remove("active"));
+        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+        document.getElementById(tabId).classList.add("active");
+        btn.classList.add("active");
+    }
+</script>
+
+</body>
+</html>

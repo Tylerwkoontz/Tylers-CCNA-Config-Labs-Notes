@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab 06: Switch Management, SVI & Hardened SSH Access | Tyler's CCNA Lab Hub</title>
+    <style>
+        :root {
+            --bg-body: #0b0f19;
+            --bg-card: #151e2e;
+            --bg-inner: #0f172a;
+            --bg-code: #070a12;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-blue: #0284c7;
+            --accent-cyan: #38bdf8;
+            --accent-green: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-purple: #8b5cf6;
+            --border-color: #223049;
+            --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        }
+
+        body {
+            margin: 0;
+            padding: 32px 20px;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: var(--font);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1040px;
+            margin: 0 auto;
+        }
+
+        .top-nav {
+            margin-bottom: 20px;
+        }
+        .top-nav a {
+            color: var(--accent-cyan);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        .top-nav a:hover { text-decoration: underline; }
+
+        .lab-header {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 24px 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.4);
+        }
+
+        .badge-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-blue   { background: #0369a1; color: #e0f2fe; }
+        .badge-purple { background: #581c87; color: #f3e8ff; }
+        .badge-amber  { background: #b45309; color: #fef3c7; }
+        .badge-green  { background: #047857; color: #d1fae5; }
+
+        h1 { margin: 0 0 10px 0; font-size: 1.85rem; color: #ffffff; letter-spacing: -0.5px; }
+        h2 { font-size: 1.25rem; color: var(--accent-cyan); margin: 0 0 16px 0; display: flex; align-items: center; gap: 8px; }
+        h3 { font-size: 1.05rem; color: #ffffff; margin: 18px 0 10px 0; }
+        p { margin: 0 0 12px 0; }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .topology-svg {
+            width: 100%;
+            height: auto;
+            max-height: 220px;
+            background: var(--bg-code);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin: 14px 0 6px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            font-size: 0.88rem;
+        }
+
+        th, td {
+            padding: 10px 14px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--bg-inner);
+            color: var(--accent-cyan);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.78rem;
+            letter-spacing: 0.5px;
+        }
+
+        tr:hover { background-color: rgba(255, 255, 255, 0.02); }
+
+        .baseline-box {
+            background: var(--bg-inner);
+            border-left: 4px solid var(--accent-amber);
+            border-radius: 6px;
+            padding: 14px 18px;
+            margin: 16px 0 0 0;
+            font-size: 0.9rem;
+        }
+        .baseline-box strong { color: var(--accent-amber); }
+
+        .req-group {
+            margin-bottom: 22px;
+        }
+        .req-group:last-child {
+            margin-bottom: 0;
+        }
+        .req-group h3 {
+            font-size: 1.05rem;
+            color: var(--accent-cyan);
+            margin: 0 0 10px 0;
+            font-weight: 700;
+        }
+        .clean-list {
+            margin: 0;
+            padding-left: 24px;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+        .clean-list li {
+            margin-bottom: 8px;
+        }
+        .clean-list li:last-child {
+            margin-bottom: 0;
+        }
+        .clean-list strong {
+            color: #ffffff;
+        }
+
+        .verif-step {
+            background: var(--bg-inner);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 14px;
+        }
+
+        .verif-title {
+            font-weight: 700;
+            color: #ffffff;
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .code-block {
+            position: relative;
+            margin: 10px 0 0 0;
+        }
+
+        pre {
+            background-color: var(--bg-code);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 14px 16px;
+            overflow-x: auto;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: #e2e8f0;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #223049;
+            color: #f8fafc;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            padding: 5px 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover { background: var(--accent-blue); border-color: var(--accent-blue); }
+
+        details.solution-drawer {
+            border-top: 4px solid var(--accent-green);
+            cursor: default;
+        }
+
+        details.solution-drawer summary {
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            user-select: none;
+            padding: 4px 0;
+        }
+
+        details.solution-drawer summary::-webkit-details-marker {
+            display: none;
+        }
+
+        details.solution-drawer summary:hover {
+            color: #ffffff;
+        }
+
+        .solution-badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            background: #1e293b;
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            transition: all 0.2s;
+        }
+
+        details[open].solution-drawer .solution-badge {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--accent-green);
+            border-color: var(--accent-green);
+        }
+
+        .tabs-header {
+            display: flex;
+            gap: 8px;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 16px;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 10px 18px;
+            font-size: 0.92rem;
+            font-weight: 700;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover { color: #ffffff; }
+        .tab-btn.active {
+            color: var(--accent-cyan);
+            border-bottom-color: var(--accent-cyan);
+        }
+
+        .tab-pane { display: none; }
+        .tab-pane.active { display: block; }
+
+        .commentary-section {
+            background: var(--bg-inner);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 18px 20px;
+            margin-bottom: 16px;
+            font-size: 0.92rem;
+        }
+        .commentary-section h4 {
+            margin: 0 0 8px 0;
+            color: var(--accent-amber);
+            font-size: 1rem;
+        }
+        .commentary-section p { margin-bottom: 10px; }
+        .commentary-section p:last-child { margin-bottom: 0; }
+        .commentary-section code {
+            background: var(--bg-code);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: var(--accent-cyan);
+            font-family: var(--font-mono);
+            font-size: 0.85em;
+        }
+
+        @media print {
+            body { background: #ffffff; color: #000000; padding: 0; }
+            .lab-header, .card, .verif-step, .commentary-section, .baseline-box { border: 1px solid #ccc; box-shadow: none; background: #ffffff; color: #000000; }
+            h1, h2, h3, .verif-title, details.solution-drawer summary { color: #000000 !important; }
+            pre { background: #f8f9fa; color: #000000; border: 1px solid #ddd; }
+            .copy-btn, .top-nav, .solution-badge { display: none !important; }
+            details.solution-drawer { display: block !important; }
+            details.solution-drawer .solution-content { display: block !important; margin-top: 0 !important; }
+            .tab-pane { display: block !important; margin-bottom: 20px; }
+            .tabs-header { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Top Navigation Breadcrumb -->
+    <div class="top-nav">
+        <a href="../index.html">&larr; Back to Master Dashboard</a>
+    </div>
+
+    <!-- 1. HEADER & METADATA -->
+    <div class="lab-header">
+        <div class="badge-group">
+            <span class="badge badge-blue">CCNA 200-301 (Domains 1.1, 2.1 & 5.5)</span>
+            <span class="badge badge-purple">CertSkills Config Lab #06</span>
+            <span class="badge badge-amber">Fundamental</span>
+            <span class="badge badge-green">Est: 25 Mins</span>
+        </div>
+        <h1>Lab 06: Basic Switch Management, SVI & Hardened SSH Access</h1>
+        <p style="color: var(--text-muted); margin: 0;">
+            <strong>Curriculum Focus:</strong> Cisco Press Official Cert Guide Vol 1, Part II (Chapters 4 & 6) • <strong>Topics:</strong> CLI Navigation, SVI (VLAN 1 IP), Default Gateway, Console Line Hardening, and Secure SSH v2 Configuration.
+        </p>
+    </div>
+
+    <!-- 2. TOPOLOGY, ADDRESSING & INITIAL STATE -->
+    <div class="card">
+        <h2>🗺️ Topology, Addressing & Initial State</h2>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">
+            <strong>Scenario:</strong> You are installing a new Cisco Catalyst switch into the campus access layer. You must establish base management settings, configure a Switch Virtual Interface (SVI) on VLAN 1 for in-band management, and configure encrypted SSH v2 remote management while disabling insecure Telnet access.
+        </p>
+
+        <!-- Hierarchical Vector SVG Diagram -->
+        <svg class="topology-svg" viewBox="0 0 800 240" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                    <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#1e293b" stroke-width="0.5"/>
+                </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grid)" />
+
+            <!-- Tier Background Bands -->
+            <rect x="20" y="15" width="760" height="90" rx="6" fill="#1e293b" fill-opacity="0.3" stroke="#334155" stroke-dasharray="4,4"/>
+            <text x="35" y="32" fill="#10b981" font-size="10" font-weight="bold" letter-spacing="1">🏢 ACCESS SWITCHING & SVI CONTROL PLANE</text>
+
+            <rect x="20" y="130" width="760" height="95" rx="6" fill="#1e293b" fill-opacity="0.3" stroke="#334155" stroke-dasharray="4,4"/>
+            <text x="35" y="147" fill="#38bdf8" font-size="10" font-weight="bold" letter-spacing="1">💻 IN-BAND SECURE MANAGEMENT TIER</text>
+
+            <!-- Downlink -->
+            <line x1="400" y1="88" x2="400" y2="155" stroke="#38bdf8" stroke-width="3" />
+            <rect x="420" y="108" width="130" height="24" rx="4" fill="#0369a1"/>
+            <text x="485" y="124" fill="#ffffff" font-size="9" font-weight="bold" text-anchor="middle">SSH v2 (TCP :22) In-Band</text>
+
+            <!-- SW1 (Top) -->
+            <rect x="330" y="38" width="140" height="50" rx="8" fill="#151e2e" stroke="#10b981" stroke-width="2"/>
+            <text x="400" y="60" fill="#10b981" font-size="13" font-weight="bold" text-anchor="middle">SW1 (Catalyst)</text>
+            <text x="400" y="78" fill="#94a3b8" font-size="9" text-anchor="middle">SVI Vlan1: 192.168.1.2/24</text>
+            <text x="410" y="98" fill="#10b981" font-size="9">Gi0/1</text>
+
+            <!-- PC-Admin (Bottom) -->
+            <circle cx="400" cy="180" r="26" fill="#151e2e" stroke="#38bdf8" stroke-width="2"/>
+            <text x="400" y="184" fill="#f8fafc" font-size="11" font-weight="bold" text-anchor="middle">PC-Admin</text>
+            <text x="400" y="218" fill="#94a3b8" font-size="9" text-anchor="middle">192.168.1.10/24 (SSH Client)</text>
+            <text x="410" y="152" fill="#38bdf8" font-size="9">eth0</text>
+        </svg>
+
+        <!-- Addressing Table -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Device</th>
+                    <th>Interface</th>
+                    <th>IPv4 Address</th>
+                    <th>Subnet Mask</th>
+                    <th>Default Gateway</th>
+                    <th>Management Purpose</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>SW1</strong></td>
+                    <td><code>Vlan 1 (SVI)</code></td>
+                    <td><code>192.168.1.2</code></td>
+                    <td><code>255.255.255.0</code></td>
+                    <td><code>192.168.1.1</code></td>
+                    <td>In-Band Switch Management</td>
+                </tr>
+                <tr>
+                    <td><strong>SW1</strong></td>
+                    <td><code>GigabitEthernet0/1</code></td>
+                    <td>Unassigned</td>
+                    <td>N/A</td>
+                    <td>N/A</td>
+                    <td>Access Port to PC-Admin (VLAN 1)</td>
+                </tr>
+                <tr>
+                    <td><strong>PC-Admin</strong></td>
+                    <td><code>eth0</code></td>
+                    <td><code>192.168.1.10</code></td>
+                    <td><code>255.255.255.0</code></td>
+                    <td><code>192.168.1.1</code></td>
+                    <td>Network Engineer Management Host</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Initial Device State -->
+        <div class="baseline-box">
+            <strong>Initial Baseline State:</strong> Switch SW1 is running factory default configuration with default hostname <code>Switch</code>. No management IP or login security is enabled. PC-Admin has IP <code>192.168.1.10/24</code> pre-configured on <code>eth0</code>.
+        </div>
+    </div>
+
+    <!-- 3. ENGINEERING REQUIREMENTS SPECIFICATION -->
+    <div class="card">
+        <h2>📋 Engineering Requirements</h2>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">
+            Configure the switch to meet the following production management and security specifications.
+        </p>
+
+        <div class="req-group">
+            <h3>1. Device Hostname & Security Banner:</h3>
+            <ul class="clean-list">
+                <li>Configure the device hostname to <strong>SW1</strong>.</li>
+                <li>Configure a Message-of-the-Day (MOTD) login banner containing a clear authorized-access warning warning that unauthorized access is strictly prohibited.</li>
+            </ul>
+        </div>
+
+        <div class="req-group">
+            <h3>2. Console Line & Privileged Mode Hardening:</h3>
+            <ul class="clean-list">
+                <li>Secure privileged EXEC mode with the strong secret password <strong>cisco123</strong>.</li>
+                <li>Configure the console port (<code>line con 0</code>) with password <strong>conpass</strong> and require password authentication upon login.</li>
+                <li>Configure console line 0 so unsolicited syslog messages do not interrupt command typing, and disable console inactivity session timeouts.</li>
+                <li>Enable Cisco IOS password encryption service so plain-text passwords in the running-config are obfuscated.</li>
+            </ul>
+        </div>
+
+        <div class="req-group">
+            <h3>3. Switch Management Interface (SVI) & Gateway:</h3>
+            <ul class="clean-list">
+                <li>Configure the Switch Virtual Interface (SVI) for <strong>VLAN 1</strong> with IPv4 address <code>192.168.1.2</code> and subnet mask <code>255.255.255.0</code>.</li>
+                <li>Enable the SVI interface administratively and bring the interface up.</li>
+                <li>Configure the switch default gateway to <code>192.168.1.1</code>.</li>
+            </ul>
+        </div>
+
+        <div class="req-group">
+            <h3>4. Hardened Secure Shell (SSH v2) Remote Management:</h3>
+            <ul class="clean-list">
+                <li>Set the IP domain name to <strong>certskills.internal</strong>.</li>
+                <li>Generate an RSA crypto key pair with a modulus size of <strong>2048</strong> bits.</li>
+                <li>Enforce <strong>SSH Version 2</strong> globally.</li>
+                <li>Create a local administrative username <strong>admin</strong> with secret password <strong>AdminSSH#2026</strong>.</li>
+                <li>Configure VTY lines 0 through 15 to require local username/password authentication.</li>
+                <li>Restrict VTY inbound transport to <strong>SSH only</strong>, preventing unencrypted Telnet connections.</li>
+            </ul>
+        </div>
+
+        <div class="req-group">
+            <h3>5. Configuration Persistence:</h3>
+            <ul class="clean-list">
+                <li>Save the active running configuration to NVRAM startup configuration.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 4. VERIFICATION & VALIDATION -->
+    <div class="card">
+        <h2>🔍 Verification & Validation Steps</h2>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">
+            Run these verification commands on the switch and PC-Admin to validate management reachability and SSH encryption.
+        </p>
+
+        <!-- Step 1 -->
+        <div class="verif-step">
+            <div class="verif-title">
+                <span>1. Verify SVI Status and IP Configuration</span>
+            </div>
+            <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 6px;">Confirm <code>Vlan1</code> interface is in the <code>up / up</code> operational state:</p>
+            <div class="code-block">
+                <pre><code>SW1# show ip interface brief
+Interface              IP-Address      OK? Method Status                Protocol
+Vlan1                  192.168.1.2     YES manual up                    up      
+GigabitEthernet0/1     unassigned      YES unset  up                    up      </code></pre>
+            </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="verif-step">
+            <div class="verif-title">
+                <span>2. Verify SSH Server Operation & Version</span>
+            </div>
+            <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 6px;">Confirm SSH version 2 is active and listening for incoming sessions:</p>
+            <div class="code-block">
+                <pre><code>SW1# show ip ssh
+SSH Enabled - version 2.0
+Authentication timeout: 120 secs; Authentication retries: 3
+Minimum expected Diffie-Hellman key size : 1024 bits
+IOS Keys in SECSH format(ssh-rsa,尊,len) :
+1024 00010001 SW1.certskills.internal</code></pre>
+            </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="verif-step">
+            <div class="verif-title">
+                <span>3. End-to-End SSH Session from Admin Endpoint</span>
+            </div>
+            <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 6px;">From <strong>PC-Admin</strong>, initiate an SSH session to the switch SVI IP:</p>
+            <div class="code-block">
+                <pre><code>PC-Admin:~$ ssh admin@192.168.1.2
+Password: [AdminSSH#2026]
+
+*** UNAUTHORIZED ACCESS PROHIBITED ***
+
+SW1> enable
+Password: [cisco123]
+SW1#</code></pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. COMPLETED CONFIGURATIONS & LAB COMMENTARY (SPOILER-FREE DRAWER) -->
+    <details class="card solution-drawer">
+        <summary>
+            <span>✅ Completed Configurations & Engineering Deep-Dive & Exam Pitfalls</span>
+            <span class="solution-badge">Click to Reveal</span>
+        </summary>
+        <div class="solution-content" style="margin-top: 18px;">
+            <p style="color: var(--text-muted); font-size: 0.9rem;">
+                Review the completed device configurations, copy Cisco IOS syntax to your clipboard, and read the in-depth lab commentary.
+            </p>
+
+            <!-- Tab Controls -->
+            <div class="tabs-header">
+                <button class="tab-btn active" onclick="showTab('tab-sw1', this)">Switch 1 (SW1)</button>
+                <button class="tab-btn" onclick="showTab('tab-host', this)">PC-Admin</button>
+                <button class="tab-btn" onclick="showTab('tab-commentary', this)">🎓 Engineering Deep-Dive & Exam Pitfalls</button>
+            </div>
+
+            <!-- Tab 1: SW1 -->
+            <div class="tab-pane active" id="tab-sw1">
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy SW1 Config</button>
+                    <pre><code>enable
+configure terminal
+!
+hostname SW1
+!
+banner motd ^C
+*** UNAUTHORIZED ACCESS PROHIBITED ***
+^C
+!
+enable secret cisco123
+service password-encryption
+!
+interface Vlan1
+ description Switch Management SVI
+ ip address 192.168.1.2 255.255.255.0
+ no shutdown
+!
+ip default-gateway 192.168.1.1
+!
+ip domain-name certskills.internal
+crypto key generate rsa modulus 2048
+ip ssh version 2
+!
+username admin secret AdminSSH#2026
+!
+line con 0
+ password conpass
+ login
+ logging synchronous
+ exec-timeout 0 0
+!
+line vty 0 15
+ login local
+ transport input ssh
+ logging synchronous
+ exec-timeout 0 0
+!
+end
+write memory</code></pre>
+                </div>
+            </div>
+
+            <!-- Tab 2: PC-Admin -->
+            <div class="tab-pane" id="tab-host">
+                <p style="font-size: 0.85rem; color: var(--text-muted);">Alpine Linux CLI Commands:</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy Host Commands</button>
+                    <pre><code># PC-Admin IP Verification & SSH Connection:
+ip addr add 192.168.1.10/24 dev eth0
+ip link set eth0 up
+ping -c 2 192.168.1.2
+ssh admin@192.168.1.2</code></pre>
+                </div>
+            </div>
+
+            <!-- Tab 3: Engineering Deep-Dive & Exam Pitfalls -->
+            <div class="tab-pane" id="tab-commentary">
+                <div class="commentary-section">
+                    <h4>🔬 Architectural Breakdown & Design Logic</h4>
+                    <p>
+                        This lab reinforces foundational Volume 1 Chapter 4 & 6 skills: securing the Cisco switch control plane, managing SVIs, and enforcing cryptographic remote administration.
+                    </p>
+                </div>
+
+                <div class="commentary-section">
+                    <h4>1. Why Does the SVI Require an Active Access/Trunk Port?</h4>
+                    <p>
+                        On a Cisco Catalyst Layer 2 switch, configuring <code>ip address</code> on <code>interface vlan 1</code> and entering <code>no shutdown</code> is not enough for the interface to reach the <code>up / up</code> state!
+                    </p>
+                    <p>
+                        An SVI is a logical Layer 3 interface. For an SVI to reach the operational <strong>up/up</strong> state, at least one physical Ethernet port assigned to that VLAN (or a trunk allowing that VLAN) must be in the active, forwarding <code>up/up</code> state. If all physical ports in VLAN 1 are unplugged or down, the SVI automatically transitions to <code>down/down</code>.
+                    </p>
+                </div>
+
+                <div class="commentary-section">
+                    <h4>2. Prerequisites for Cisco IOS SSH Key Generation</h4>
+                    <p>
+                        When running <code>crypto key generate rsa</code>, Cisco IOS uses the router/switch <strong>hostname</strong> and <strong>IP domain-name</strong> to name the encryption key (e.g., <code>SW1.certskills.internal</code>).
+                    </p>
+                    <ul>
+                        <li>If you attempt to generate RSA keys before setting a hostname or domain name, IOS will reject the command.</li>
+                        <li>Specifying a modulus of <strong>1024 bits or greater</strong> (2048 is recommended) is required to enable <strong>SSH Version 2</strong>. A 512-bit key restricts the switch to insecure SSH Version 1.</li>
+                    </ul>
+                </div>
+
+                <div class="commentary-section">
+                    <h4>3. VTY Transport Input & Login Local Traps</h4>
+                    <p>
+                        On VTY lines, failing to specify <code>transport input ssh</code> leaves Telnet enabled by default, allowing network attackers to sniff cleartext administrator passwords in transit.
+                    </p>
+                    <p>
+                        Furthermore, configuring <code>login local</code> instructs the switch to check the local database for usernames created with the <code>username &lt;user&gt; secret &lt;pass&gt;</code> global command. If you configure <code>login local</code> without first creating a local user, you will lock yourself out of VTY management upon disconnecting!
+                    </p>
+                </div>
+
+                <div class="commentary-section">
+                    <h4>4. Cisco Type 7 Password Encryption Limitations</h4>
+                    <p>
+                        The <code>service password-encryption</code> command applies Cisco proprietary <strong>Type 7 encryption</strong> to simple passwords (like console line passwords). 
+                    </p>
+                    <p>
+                        Type 7 is not true cryptography—it is a simple Vigenère cipher that can be decrypted online in seconds. It only protects against "over-the-shoulder" viewing of the screen. For actual security, always use <code>enable secret</code> and <code>username ... secret</code>, which utilize irreversible MD5, SHA-256 (Type 8), or Scrypt (Type 9) hashing.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </details>
+
+</div>
+
+<script>
+    // 1-Click Copy Function
+    function copyCode(btn) {
+        const pre = btn.nextElementSibling;
+        navigator.clipboard.writeText(pre.innerText).then(() => {
+            const originalText = btn.innerText;
+            btn.innerText = "Copied!";
+            btn.style.background = "#10b981";
+            btn.style.borderColor = "#10b981";
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.style.background = "#223049";
+                btn.style.borderColor = "#334155";
+            }, 2000);
+        });
+    }
+
+    // Solution Tabs Switcher
+    function showTab(tabId, btn) {
+        document.querySelectorAll(".tab-pane").forEach(pane => pane.classList.remove("active"));
+        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+        document.getElementById(tabId).classList.add("active");
+        btn.classList.add("active");
+    }
+</script>
+
+</body>
+</html>

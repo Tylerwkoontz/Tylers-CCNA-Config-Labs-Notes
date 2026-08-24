@@ -3,7 +3,7 @@
 ## Student Profile & Roadmap
 - **Target Exam**: Cisco CCNA (200-301 v1.1)
 - **Primary Literature**: Wendell Odom's Cisco Press Official Cert Guides (Volume 1 & Volume 2)
-- **Active Focus**: **Volume 1, Chapter 9: Subnet Design & IPv4 Routing Configuration**
+- **Active Focus**: **Volume 1, Part II: Implementing Ethernet LANs (Chapters 4–7)**
 - **Lab Infrastructure**: Cisco Modeling Labs (CML 2.10) on Proxmox VE (`cml-controller.internal`)
 - **Dashboard**: `~/ccna-study/index.html` (Master Interactive Dashboard)
 - **Lab Format**: `~/ccna-study/labs/*.html` (100% Rich Standalone Interactive HTML Workbooks)

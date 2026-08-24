@@ -1,0 +1,123 @@
+lab:
+  title: 'CCNA Lab 07B: Interface Diagnostics & Duplex Mismatches'
+  description: 'Vol 1 Ch 5 & 7: Inter-Switch Duplex Mismatch (Hierarchical Layout)'
+  notes: "# CCNA Exam Lab: Interface Diagnostics & Duplex Mismatch Isolation\n**Exam\
+    \ Blueprint**: CCNA 200-301 v1.1 Domains 1.1, 2.1 & 2.4\n**Focus**: Cisco Press\
+    \ OCG Vol 1, Chapters 5 & 7\n\n---\n## \U0001F3E2 Scenario & Network Topology\n\
+    Users report high packet loss and poor performance when transferring files between\
+    \ `PC-A` and `Server-B`. An autonegotiation issue is suspected on the inter-switch\
+    \ connection between `SW1` and `SW2`.\n\n### Baseline Fault State\n- `SW1 Gi0/1`\
+    \ is hardcoded to 100 Mbps / Full Duplex.\n- `SW2 Gi0/1` is set to auto-negotiate,\
+    \ resulting in parallel detection defaulting to Half Duplex.\n\n---\n## \U0001F4CB\
+    \ Exam Tasks & Technical Requirements\n1. **Operational State Inspection**:\n\
+    \   - Examine the operational status, speed, and duplex settings on `SW1 Gi0/1`\
+    \ and `SW2 Gi0/1`. Identify the duplex mismatch.\n2. **Error Counter Analysis\
+    \ Under Load**:\n   - Generate test traffic from `PC-A` to `Server-B`.\n   - Inspect\
+    \ detailed interface counters on `SW1` and `SW2`.\n   - Identify which side of\
+    \ the link records **Late Collisions** and which side records **CRC / Frame Check\
+    \ Sequence errors**. Explain why late collisions occur only on half-duplex links.\n\
+    3. **Remediation & Standardization**:\n   - Reconfigure both switches so that\
+    \ `Gi0/1` operates at 1000 Mbps Full Duplex.\n   - Clear all hardware interface\
+    \ counters.\n4. **Post-Fix Verification**:\n   - Re-test traffic under load and\
+    \ verify zero errors or dropped packets.\n\n---\n## \U0001F50D Success & Verification\
+    \ Criteria\n- `show interfaces status` indicates matching speed and duplex on\
+    \ both switches.\n- `show interfaces GigabitEthernet0/1` reflects 0 CRC errors,\
+    \ 0 input errors, and 0 late collisions after traffic generation.\n- *Need a hint?\
+    \ Check the interactive workbook in `~/ccna-study/labs/lab07b-interface-diagnostics-duplex.html`.*"
+  version: 0.3.1
+  node_staging:
+    enabled: false
+    start_remaining: true
+    abort_on_failure: false
+nodes:
+- id: n0
+  label: SW1
+  node_definition: iosvl2
+  x: -180
+  y: -120
+  interfaces:
+  - id: i0
+    label: Loopback0
+    type: loopback
+  - id: i1
+    label: GigabitEthernet0/0
+    type: physical
+    slot: 0
+  - id: i2
+    label: GigabitEthernet0/1
+    type: physical
+    slot: 1
+  - id: i3
+    label: GigabitEthernet0/2
+    type: physical
+    slot: 2
+  configuration:
+  - name: ios_config.txt
+    content: "hostname SW1\ninterface GigabitEthernet0/1\n speed 100\n duplex full\n\
+      !\nline con 0\n logging synchronous\n exec-timeout 0 0\nend\n"
+- id: n1
+  label: SW2
+  node_definition: iosvl2
+  x: 180
+  y: -120
+  interfaces:
+  - id: i0
+    label: Loopback0
+    type: loopback
+  - id: i1
+    label: GigabitEthernet0/0
+    type: physical
+    slot: 0
+  - id: i2
+    label: GigabitEthernet0/1
+    type: physical
+    slot: 1
+  - id: i3
+    label: GigabitEthernet0/2
+    type: physical
+    slot: 2
+  configuration:
+  - name: ios_config.txt
+    content: "hostname SW2\ninterface GigabitEthernet0/1\n speed auto\n duplex auto\n\
+      !\nline con 0\n logging synchronous\n exec-timeout 0 0\nend\n"
+- id: n2
+  label: PC-A
+  node_definition: alpine
+  x: -180
+  y: 120
+  interfaces:
+  - id: i0
+    label: eth0
+    type: physical
+    slot: 0
+- id: n3
+  label: Server-B
+  node_definition: alpine
+  x: 180
+  y: 120
+  interfaces:
+  - id: i0
+    label: eth0
+    type: physical
+    slot: 0
+links:
+- id: l0
+  n1: n0
+  n2: n1
+  i1: i2
+  i2: i2
+  label: SW1-Gi0/1<->SW2-Gi0/1
+- id: l1
+  n1: n2
+  n2: n0
+  i1: i0
+  i2: i3
+  label: PC-A-eth0<->SW1-Gi0/2
+- id: l2
+  n1: n3
+  n2: n1
+  i1: i0
+  i2: i3
+  label: Server-B-eth0<->SW2-Gi0/2
+annotations: []
+smart_annotations: []
