@@ -7,7 +7,7 @@
 
 A modern, standalone interactive web suite and automated Cisco Modeling Labs (CML 2.10) environment designed for mastering the **Cisco CCNA 200-301 (v1.1)** certification.
 
-Built with a **zero-dependency pure HTML architecture**, this repository features 9 comprehensive, spoiler-free performance-based lab workbooks, responsive multi-tier SVG topologies, mental subnetting drills, and automated CML REST API provisioning scripts.
+Built with a **zero-dependency pure HTML architecture**, this repository features 11 comprehensive, spoiler-free performance-based lab workbooks, responsive multi-tier SVG topologies, mental subnetting drills, and automated CML REST API provisioning scripts.
 
 ---
 
@@ -33,6 +33,8 @@ Each lab is structured as an authentic **CCNA Performance-Based Question (Simlet
 | **Lab 06B**| **[Cross-Subnet Switch Management](labs/lab06b-cross-subnet-management.html)** | `1.1`, `2.8`, `3.1` | `ip default-gateway` Fault Isolation & Remote NOC Administration | [`cml-templates/lab06b...yaml`](cml-templates/lab06b-cross-subnet-management.yaml) |
 | **Lab 07** | **[Switch Interfaces & MAC Table](labs/lab07-switch-interfaces-mac-table.html)** | `1.13`, `2.1`, `2.4` | Port Speed/Duplex Locking, Dynamic MAC Learning & Static Mapping | [`cml-templates/lab07...yaml`](cml-templates/lab07-switch-interfaces-mac-table.yaml) |
 | **Lab 07B**| **[Interface Diagnostics & Duplex](labs/lab07b-interface-diagnostics-duplex.html)** | `1.4`, `2.4` | Parallel Detection Mismatches, Late Collisions vs CRC Isolation | [`cml-templates/lab07b...yaml`](cml-templates/lab07b-interface-diagnostics-duplex.html) |
+| **Lab 09** | **[STP Root Election & Path Cost](labs/lab09-stp-root-election-path-cost.html)** | `2.5` | 802.1D Bridge ID Hierarchy, Deterministic Root Election & Cost Tuning | [`cml-templates/lab09...yaml`](cml-templates/lab09-stp-root-election-path-cost.yaml) |
+| **Lab 09B**| **[STP Parallel Links & Timers](labs/lab09b-stp-port-priority-timers.html)** | `2.5` | Parallel Link Tiebreakers, Sender Port Priority & Timer Tuning | [`cml-templates/lab09b...yaml`](cml-templates/lab09b-stp-port-priority-timers.yaml) |
 | **Lab 17** | **[Multi-Subnet IPv4 Routing](labs/lab17-multi-subnet-routing.html)** | `1.6`, `3.1`, `3.3` | VLSM Subnet Calculations (/26, /27, /30) & Static Route Verification | [`cml-templates/lab17...yaml`](cml-templates/lab17-multi-subnet-routing.yaml) |
 
 ---
@@ -63,32 +65,76 @@ Each lab is structured as an authentic **CCNA Performance-Based Question (Simlet
 
 ---
 
-## ⚡ Cisco Modeling Labs (CML 2.10) Automation
+## ⚡ Cisco Modeling Labs (CML 2.10) & Ubuntu Workflow Reference
 
-The repository includes pre-built YAML topology definitions and an automated Python CLI client for Cisco Modeling Labs (CML 2.10 on Proxmox VE or Bare Metal).
+This repository is optimized for a **zero-touch background workflow** on Ubuntu. You never have to manually manage proxies or remember port mappings.
 
-### 1. Prerequisites & Environment
-Ensure you have Python 3.8+ installed:
+---
+
+### 🚀 1. The Daily Command Cheat Sheet (`~/.zshrc`)
+
+| Command | Action | Description |
+| :--- | :--- | :--- |
+| **`cml-con`** | Interactive Menu | Shows active labs; select a lab to open its side-by-side **Split Grid** |
+| **`cml-con 09b`** | Lab Split Grid | **Launches all 4 devices for Lab 09B side-by-side in a 2x2 grid** |
+| **`cml-con SW1`** | Direct Connect | Instantly connects straight to `SW1` console in your current shell |
+| **`cml-con all`** | Full Grid | Launches a multi-pane split grid across all running lab nodes |
+| **`cml-labs`** | List Topologies | Queries `cml-controller.internal` for active and stopped lab IDs |
+| **`cml-ui`** | Breakout Dashboard | Opens Web UI at `http://127.0.0.1:8080` for **1-click live Wireshark captures** |
+| **`cml-dash`** | HTML Study Hub | Launches your master interactive CCNA workbook dashboard |
+
+
+
+---
+
+### 🔌 2. Zero-Touch Background Service (`systemd`)
+
+The CML Breakout Tool runs as an automated background user daemon (`cml-breakout.service`) on your workstation:
+* **Starts on Boot**: The proxy is always running quietly in the background on ports `9000+`.
+* **Zero Manual Steps**: You never have to keep a dedicated terminal tab open for `./start-breakout.sh`.
+* **Service Controls** (if ever needed):
+  ```bash
+  systemctl --user status cml-breakout   # Check proxy status
+  systemctl --user restart cml-breakout  # Force re-sync with CML
+  systemctl --user stop cml-breakout     # Stop background proxy
+  ```
+
+---
+
+### 🧪 3. Lab Lifecycle & Switching Labs
+
+When you switch between different CCNA chapters (e.g. from Lab 09 STP to Lab 06 SSH):
 ```bash
-export CML_URL="https://cml-controller.internal"
-export CML_USERNAME="admin"
-export CML_PASSWORD="your-secure-password"
+# 1. Stop old lab & start new lab (auto-syncs breakout ports in the background)
+python3 scripts/cml_client.py stop <old-uuid>
+python3 scripts/cml_client.py start <new-uuid>
+
+# 2. Connect immediately to new devices!
+cml-con          # Menu will now list the newly started lab nodes
+cml-con all      # Opens all new lab nodes in tabs
 ```
+* Existing terminal sessions will cleanly show `Connection closed by foreign host`.
+* The background service automatically detects the new lab nodes and maps fresh ports.
 
-### 2. Manage Labs with CLI
-```bash
-# List all active lab topologies on CML
-python3 scripts/cml_client.py list
+---
 
-# Start a specific lab topology
-python3 scripts/cml_client.py start <lab-uuid>
+### 🚪 4. Terminal Escape / Disconnect Shortcut
 
-# Stop a lab topology
-python3 scripts/cml_client.py stop <lab-uuid>
+To cleanly exit any Cisco console session without closing your terminal window:
+1. Press **`Ctrl + ]`** (Hold `Ctrl` and tap `]`).
+2. Type **`quit`** (or `q`) and press `Enter`.
+3. *(Alternative)* Press **`Ctrl + Shift + W`** to close the active tab.
 
-# Wipe lab node state to initial clean baseline
-python3 scripts/cml_client.py wipe <lab-uuid>
-```
+---
+
+### 🦈 5. Live Wireshark Packet Sniffing
+
+To capture live traffic (STP BPDUs, ARP resolution, TCP 3-way handshakes) directly in native Ubuntu Wireshark:
+1. Run `cml-ui` and open `http://127.0.0.1:8080`.
+2. Click the **Wireshark** icon next to any interface or link.
+3. Native Wireshark launches immediately on your desktop streaming the live wire traffic.
+
+
 
 ---
 

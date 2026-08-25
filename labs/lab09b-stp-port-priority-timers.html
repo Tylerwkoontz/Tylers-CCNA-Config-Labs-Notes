@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab 09B: STP Parallel Links, Port Priority & Convergence Timers | Tyler's CCNA Lab Hub</title>
+    <style>
+        :root {
+            --bg-body: #0b0f19;
+            --bg-card: #151e2e;
+            --bg-inner: #0f172a;
+            --bg-code: #070a12;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-blue: #0284c7;
+            --accent-cyan: #38bdf8;
+            --accent-green: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-purple: #8b5cf6;
+            --accent-red: #ef4444;
+            --border-color: #223049;
+            --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        }
+
+        body {
+            margin: 0;
+            padding: 32px 20px;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: var(--font);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1060px;
+            margin: 0 auto;
+        }
+
+        .top-nav {
+            margin-bottom: 20px;
+        }
+        .top-nav a {
+            color: var(--accent-cyan);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        .top-nav a:hover { text-decoration: underline; }
+
+        .lab-header {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 24px 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.4);
+        }
+
+        .badge-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-blue   { background: #0369a1; color: #e0f2fe; }
+        .badge-purple { background: #581c87; color: #f3e8ff; }
+        .badge-amber  { background: #b45309; color: #fef3c7; }
+        .badge-green  { background: #047857; color: #d1fae5; }
+
+        h1 { margin: 0 0 10px 0; font-size: 1.85rem; color: #ffffff; letter-spacing: -0.5px; }
+        h2 { font-size: 1.25rem; color: var(--accent-cyan); margin: 0 0 16px 0; display: flex; align-items: center; gap: 8px; }
+        h3 { font-size: 1.05rem; color: #ffffff; margin: 18px 0 10px 0; }
+        p { margin: 0 0 12px 0; }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .topology-svg {
+            width: 100%;
+            height: auto;
+            max-height: 400px;
+            background: var(--bg-code);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin: 14px 0 6px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            font-size: 0.88rem;
+        }
+
+        th, td {
+            padding: 10px 14px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--bg-inner);
+            color: var(--accent-cyan);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.78rem;
+            letter-spacing: 0.5px;
+        }
+
+        tr:hover { background-color: rgba(255, 255, 255, 0.02); }
+
+        .baseline-box {
+            background: var(--bg-inner);
+            border-left: 4px solid var(--accent-amber);
+            border-radius: 6px;
+            padding: 14px 18px;
+            margin: 16px 0 0 0;
+            font-size: 0.9rem;
+        }
+        .baseline-box strong { color: var(--accent-amber); }
+
+        .req-group {
+            margin-bottom: 22px;
+        }
+        .req-group:last-child {
+            margin-bottom: 0;
+        }
+        .req-group h3 {
+            font-size: 1.05rem;
+            color: var(--accent-cyan);
+            margin: 0 0 10px 0;
+            font-weight: 700;
+        }
+        .clean-list {
+            margin: 0;
+            padding-left: 24px;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+        .clean-list li {
+            margin-bottom: 8px;
+        }
+        .clean-list li:last-child {
+            margin-bottom: 0;
+        }
+        .clean-list strong {
+            color: #ffffff;
+        }
+
+        .verif-step {
+            background: var(--bg-inner);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 14px;
+        }
+
+        .verif-title {
+            font-weight: 700;
+            color: #ffffff;
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checklist {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.92rem;
+        }
+        .checklist-item:last-child { border-bottom: none; }
+
+        .checklist-item input[type="checkbox"] {
+            margin-top: 4px;
+            cursor: pointer;
+            accent-color: var(--accent-green);
+            width: 16px;
+            height: 16px;
+        }
+
+        .progress-container {
+            background: var(--bg-inner);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 14px 18px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .progress-bar-bg {
+            flex-grow: 1;
+            height: 10px;
+            background: #1e293b;
+            border-radius: 9999px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-green));
+            transition: width 0.3s ease;
+        }
+
+        .code-block {
+            position: relative;
+            background: var(--bg-code);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 12px 0;
+            overflow-x: auto;
+        }
+
+        pre {
+            margin: 0;
+            font-family: var(--font-mono);
+            font-size: 0.88rem;
+            color: #e2e8f0;
+            line-height: 1.5;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #223049;
+            color: #f8fafc;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            padding: 5px 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover { background: var(--accent-blue); border-color: var(--accent-blue); }
+
+        details.solution-drawer {
+            border-top: 4px solid var(--accent-green);
+            cursor: default;
+        }
+
+        details.solution-drawer summary {
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            user-select: none;
+            padding: 4px 0;
+        }
+
+        details.solution-drawer summary::-webkit-details-marker {
+            display: none;
+        }
+
+        details.solution-drawer summary:hover {
+            color: #ffffff;
+        }
+
+        .solution-badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            background: #1e293b;
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            transition: all 0.2s;
+        }
+
+        details[open].solution-drawer .solution-badge {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--accent-green);
+            border-color: var(--accent-green);
+        }
+
+        .tabs-header {
+            display: flex;
+            gap: 8px;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 16px;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 10px 18px;
+            font-size: 0.92rem;
+            font-weight: 700;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover { color: #ffffff; }
+        .tab-btn.active {
+            color: var(--accent-cyan);
+            border-bottom-color: var(--accent-cyan);
+        }
+
+        .tab-pane { display: none; }
+        .tab-pane.active { display: block; }
+
+        .commentary-section {
+            background: var(--bg-inner);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 18px 20px;
+            margin-bottom: 16px;
+            font-size: 0.92rem;
+        }
+        .commentary-section h4 {
+            margin: 0 0 8px 0;
+            color: var(--accent-amber);
+            font-size: 1rem;
+        }
+        .commentary-section p { margin-bottom: 10px; }
+        .commentary-section p:last-child { margin-bottom: 0; }
+        .commentary-section code {
+            background: var(--bg-code);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: var(--accent-cyan);
+            font-family: var(--font-mono);
+            font-size: 0.85em;
+        }
+
+        .callout {
+            border-left: 4px solid var(--accent-cyan);
+            background: rgba(56, 189, 248, 0.08);
+            border-radius: 6px;
+            padding: 12px 16px;
+            margin: 12px 0;
+            font-size: 0.9rem;
+        }
+        .callout-amber {
+            border-left-color: var(--accent-amber);
+            background: rgba(245, 158, 11, 0.08);
+        }
+
+        @media print {
+            body { background: #ffffff; color: #000000; padding: 0; }
+            .lab-header, .card, .verif-step, .commentary-section, .baseline-box, .callout { border: 1px solid #ccc; box-shadow: none; background: #ffffff; color: #000000; }
+            h1, h2, h3, .verif-title, details.solution-drawer summary { color: #000000 !important; }
+            pre { background: #f8f9fa; color: #000000; border: 1px solid #ddd; }
+            .copy-btn, .top-nav, .solution-badge, .progress-container { display: none !important; }
+            details.solution-drawer { display: block !important; }
+            details.solution-drawer .solution-content { display: block !important; margin-top: 0 !important; }
+            .tab-pane { display: block !important; margin-bottom: 20px; }
+            .tabs-header { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Top Navigation Breadcrumb -->
+    <div class="top-nav">
+        <a href="../index.html">&larr; Back to Master Dashboard</a>
+    </div>
+
+    <!-- 1. HEADER & METADATA -->
+    <div class="lab-header">
+        <div class="badge-group">
+            <span class="badge badge-blue">CCNA 200-301 (Domain 2.5)</span>
+            <span class="badge badge-purple">CertSkills Config Lab #09B</span>
+            <span class="badge badge-amber">STP Advanced</span>
+            <span class="badge badge-green">Est: 25 Mins</span>
+        </div>
+        <h1>Lab 09B: STP Parallel Links, Port Priority & Convergence Timers</h1>
+        <p style="color: var(--text-muted); margin: 0;">
+            <strong>Curriculum Focus:</strong> Cisco Press Official Cert Guide Vol 1, Part III (Chapter 9: "Spanning Tree Protocol Concepts") • <strong>Topics:</strong> Parallel Link STP Tiebreakers, Sender Port Priority (Port ID), STP Convergence Timers (Hello, Max Age, Forward Delay), and Classic STP State Transitions.
+        </p>
+    </div>
+
+    <!-- Progress Tracker -->
+    <div class="progress-container">
+        <div>
+            <strong style="color: #ffffff; font-size: 0.95rem;">Lab Completion Progress</strong>
+            <div style="color: var(--text-muted); font-size: 0.8rem;" id="progress-text">0 of 6 Tasks Completed (0%)</div>
+        </div>
+        <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="progress-bar"></div>
+        </div>
+    </div>
+
+    <!-- 2. SCENARIO & TOPOLOGY -->
+    <div class="card">
+        <h2>🏢 Enterprise Scenario & Physical Topology</h2>
+        <p>
+            You are tuning Layer 2 path selection and convergence characteristics between core switch <code>SW1</code> and access switch <code>SW2</code>. Two parallel GigabitEthernet links (<code>Gi0/1</code> and <code>Gi0/2</code>) interconnect the switches for link redundancy.
+        </p>
+        <p>
+            Because both parallel links connect the exact same two switches with identical Gigabit port costs (Cost = 4) and identical Root Bridge IDs, the first two STP tiebreakers (Root Path Cost and Sender Bridge ID) result in a <strong>dead tie</strong>.
+        </p>
+        <p>
+            In this lab, you will analyze why <code>SW2</code> places interface <code>Gi0/2</code> into the Alternate/Blocking state by default due to the <strong>Sender Port ID</strong> advertised in SW1's BPDUs. You will then manipulate the Port Priority on <code>SW1 Gi0/2</code> to invert active forwarding paths without altering interface costs, and examine how tuning STP timers (Hello Time, Max Age, Forward Delay) affects network convergence.
+        </p>
+
+        <!-- Embedded Topology SVG -->
+        <svg class="topology-svg" viewBox="0 0 800 380" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="rootGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#78350f"/>
+                    <stop offset="100%" stop-color="#451a03"/>
+                </linearGradient>
+                <linearGradient id="swGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#1e293b"/>
+                    <stop offset="100%" stop-color="#0f172a"/>
+                </linearGradient>
+                <linearGradient id="hostGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#1e3a8a"/>
+                    <stop offset="100%" stop-color="#172554"/>
+                </linearGradient>
+                <filter id="glow2" x="-20%" y="-20%" width="140%" height="140%">
+                    <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#f59e0b" flood-opacity="0.3"/>
+                </filter>
+            </defs>
+
+            <!-- Dual Parallel Links -->
+            <!-- Link 1: Upper Parallel Link Gi0/1 -->
+            <path d="M 220,110 C 310,60 490,60 580,110" fill="none" stroke="#38bdf8" stroke-width="3"/>
+            <rect x="330" y="55" width="140" height="24" rx="4" fill="#070a12" stroke="#223049" />
+            <text x="400" y="71" fill="#38bdf8" font-size="11" font-family="monospace" text-anchor="middle" font-weight="bold">Link 1: Gi0/1 (Prio 128.2)</text>
+
+            <!-- Link 2: Lower Parallel Link Gi0/2 -->
+            <path d="M 220,150 C 310,200 490,200 580,150" fill="none" stroke="#f59e0b" stroke-dasharray="6,4" stroke-width="3"/>
+            <rect x="330" y="175" width="140" height="24" rx="4" fill="#070a12" stroke="#f59e0b" />
+            <text x="400" y="191" fill="#f59e0b" font-size="11" font-family="monospace" text-anchor="middle" font-weight="bold">Link 2: Gi0/2 (Prio 64.3)</text>
+
+            <!-- Host Access Links -->
+            <line x1="140" y1="130" x2="140" y2="290" stroke="#10b981" stroke-width="2.5"/>
+            <line x1="660" y1="130" x2="660" y2="290" stroke="#10b981" stroke-width="2.5"/>
+
+            <!-- NODE: SW1 (Root Bridge) -->
+            <g transform="translate(140, 130)">
+                <rect x="-110" y="-55" width="220" height="110" rx="10" fill="url(#rootGrad2)" stroke="#f59e0b" stroke-width="2" filter="url(#glow2)"/>
+                <text x="0" y="-28" fill="#fef3c7" font-size="14" font-weight="bold" text-anchor="middle">👑 SW1 (ROOT BRIDGE)</text>
+                <text x="0" y="-8" fill="#fbbf24" font-size="11" font-family="monospace" text-anchor="middle">Priority: 4096 (VLAN 1: 4097)</text>
+                <text x="0" y="10" fill="#e2e8f0" font-size="10" font-family="monospace" text-anchor="middle">Gi0/1: DP (Prio 128.2)</text>
+                <text x="0" y="26" fill="#38bdf8" font-size="10" font-family="monospace" text-anchor="middle">Gi0/2: DP (Prio 64.3 &lt; 128)</text>
+                <text x="0" y="42" fill="#94a3b8" font-size="9" font-family="monospace" text-anchor="middle">Hello 2s | MaxAge 14s | FwdDelay 10s</text>
+            </g>
+
+            <!-- NODE: SW2 (Non-Root Switch) -->
+            <g transform="translate(660, 130)">
+                <rect x="-110" y="-55" width="220" height="110" rx="10" fill="url(#swGrad2)" stroke="#38bdf8" stroke-width="2"/>
+                <text x="0" y="-28" fill="#ffffff" font-size="14" font-weight="bold" text-anchor="middle">🔀 SW2 (Non-Root)</text>
+                <text x="0" y="-8" fill="#94a3b8" font-size="11" font-family="monospace" text-anchor="middle">Priority: 32768 (32769)</text>
+                <text x="0" y="10" fill="#f59e0b" font-size="10" font-family="monospace" text-anchor="middle">Gi0/1: [RP &rarr; AP/BLK]</text>
+                <text x="0" y="26" fill="#10b981" font-size="10" font-family="monospace" text-anchor="middle">Gi0/2: [AP/BLK &rarr; ROOT FWD]</text>
+                <text x="0" y="42" fill="#94a3b8" font-size="9" font-family="monospace" text-anchor="middle">Adopts SW1's Advertised Timers</text>
+            </g>
+
+            <!-- Port Labels -->
+            <text x="255" y="90" fill="#38bdf8" font-size="11" font-family="monospace" font-weight="bold">Gi0/1 [DP]</text>
+            <text x="255" y="170" fill="#38bdf8" font-size="11" font-family="monospace" font-weight="bold">Gi0/2 [DP]</text>
+
+            <text x="500" y="90" fill="#f59e0b" font-size="11" font-family="monospace" font-weight="bold">Gi0/1 [AP (BLK)]</text>
+            <text x="500" y="170" fill="#10b981" font-size="11" font-family="monospace" font-weight="bold">Gi0/2 [RP (FWD)]</text>
+
+            <!-- NODE: PC-A -->
+            <g transform="translate(140, 310)">
+                <rect x="-70" y="-20" width="140" height="40" rx="6" fill="url(#hostGrad2)" stroke="#3b82f6" stroke-width="1.5"/>
+                <text x="0" y="-2" fill="#ffffff" font-size="12" font-weight="bold" text-anchor="middle">💻 PC-A</text>
+                <text x="0" y="13" fill="#93c5fd" font-size="10" font-family="monospace" text-anchor="middle">10.1.1.10/24 (SW1 Gi0/3)</text>
+            </g>
+
+            <!-- NODE: PC-B -->
+            <g transform="translate(660, 310)">
+                <rect x="-70" y="-20" width="140" height="40" rx="6" fill="url(#hostGrad2)" stroke="#3b82f6" stroke-width="1.5"/>
+                <text x="0" y="-2" fill="#ffffff" font-size="12" font-weight="bold" text-anchor="middle">💻 PC-B</text>
+                <text x="0" y="13" fill="#93c5fd" font-size="10" font-family="monospace" text-anchor="middle">10.1.1.20/24 (SW2 Gi0/3)</text>
+            </g>
+        </svg>
+
+        <!-- Parallel Link Decision Table -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Tiebreaker Step</th>
+                    <th>Link 1 (Gi0/1) Parameter</th>
+                    <th>Link 2 (Gi0/2) Parameter</th>
+                    <th>Winner / Decision</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>1. Root Path Cost</strong></td>
+                    <td>Cost 4</td>
+                    <td>Cost 4</td>
+                    <td><span style="color: var(--accent-amber);">Tie (4 = 4)</span></td>
+                </tr>
+                <tr>
+                    <td><strong>2. Sender Bridge ID</strong></td>
+                    <td>SW1 (<code>4097.5254.0012.3456</code>)</td>
+                    <td>SW1 (<code>4097.5254.0012.3456</code>)</td>
+                    <td><span style="color: var(--accent-amber);">Tie (Same Switch)</span></td>
+                </tr>
+                <tr>
+                    <td><strong>3. Default Sender Port Priority / ID</strong></td>
+                    <td><code>128.2</code> (Priority 128, Port 2)</td>
+                    <td><code>128.3</code> (Priority 128, Port 3)</td>
+                    <td><strong style="color: var(--accent-cyan);">Gi0/1 Wins</strong> (128.2 &lt; 128.3 &rarr; Gi0/2 Blocked)</td>
+                </tr>
+                <tr>
+                    <td><strong>4. Tuned Sender Port Priority (SW1)</strong></td>
+                    <td><code>128.2</code> (Unchanged)</td>
+                    <td><code>64.3</code> (Tuned to 64)</td>
+                    <td><strong style="color: var(--accent-green);">Gi0/2 Wins!</strong> (64.3 &lt; 128.2 &rarr; Gi0/1 Blocked)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="baseline-box">
+            <strong>⚠️ Key Concept:</strong> STP tiebreaker #3 and #4 evaluate the <em>sender's</em> port priority and internal port number (the neighbor switch sending BPDUs), NOT the local switch's port numbers. Therefore, to change which port SW2 blocks, you must configure the port priority on <strong>SW1</strong>!
+        </div>
+    </div>
+
+    <!-- 3. TECHNICAL REQUIREMENTS (SIMLET STYLE) -->
+    <div class="card">
+        <h2>📋 Performance-Based Exam Requirements</h2>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">
+            Implement all requirements on the CML switches from memory according to CCNA 200-301 standards.
+        </p>
+
+        <div class="req-group">
+            <h3>1. Base Setup & Root Bridge Election</h3>
+            <ul class="clean-list">
+                <li>Configure hostnames <code>SW1</code> and <code>SW2</code>.</li>
+                <li>Configure <code>SW1</code> as the Root Bridge for VLAN 1 with a priority of <strong>4096</strong>.</li>
+                <li>Configure <code>Gi0/1</code> and <code>Gi0/2</code> on both switches as 802.1Q trunks with <code>no shutdown</code>.</li>
+            </ul>
+        </div>
+
+        <div class="req-group">
+            <h3>2. Baseline Parallel Link Analysis</h3>
+            <ul class="clean-list">
+                <li>Verify on <strong>SW2</strong> that interface <code>Gi0/1</code> is elected as the <code>Root Port (Root FWD)</code> and <code>Gi0/2</code> is in the <code>Alternate/Blocking (Altn BLK)</code> state.</li>
+                <li>Execute <code>show spanning-tree detail</code> on SW2 and observe the <em>Designated Port ID</em> received on each port (<code>128.2</code> on Gi0/1 vs <code>128.3</code> on Gi0/2).</li>
+            </ul>
+        </div>
+
+        <div class="req-group">
+            <h3>3. Invert Forwarding Link via Port Priority (Without Changing Cost)</h3>
+            <ul class="clean-list">
+                <li>On <strong>SW1</strong>, configure interface <code>GigabitEthernet0/2</code> with a Spanning Tree port priority of <strong>64</strong> for VLAN 1 (using <code>spanning-tree port-priority 64</code> or <code>spanning-tree vlan 1 port-priority 64</code>).</li>
+                <li>Verify on <strong>SW2</strong> that <code>Gi0/2</code> transitions to <strong>Root Port (Forwarding)</strong> and <code>Gi0/1</code> is placed into <strong>Alternate Port (Blocking)</strong>.</li>
+            </ul>
+        </div>
+
+        <div class="req-group">
+            <h3>4. STP Timer Tuning on Root Bridge</h3>
+            <ul class="clean-list">
+                <li>On <strong>SW1</strong> (Root Bridge), tune the Spanning Tree timers for VLAN 1:
+                    <ul>
+                        <li><strong>Hello Time</strong>: <code>2</code> seconds</li>
+                        <li><strong>Forward Delay</strong>: <code>10</code> seconds (reduced from default 15)</li>
+                        <li><strong>Max Age</strong>: <code>14</code> seconds (reduced from default 20)</li>
+                    </ul>
+                </li>
+                <li>Verify on both <strong>SW1</strong> and <strong>SW2</strong> using <code>show spanning-tree vlan 1</code> that the non-root switch SW2 automatically inherits the tuned timers from SW1's BPDUs.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 4. STEP-BY-STEP VERIFICATION & CHECKLIST -->
+    <div class="card">
+        <h2>🔍 Interactive Verification & Task Checklist</h2>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">
+            Track your progress as you execute and verify the commands on your terminal console.
+        </p>
+
+        <ul class="checklist">
+            <li class="checklist-item">
+                <input type="checkbox" id="task1" onchange="updateProgress()">
+                <label for="task1"><strong>Task 1:</strong> Hostnames and console logging synchronous configured on SW1 and SW2.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="task2" onchange="updateProgress()">
+                <label for="task2"><strong>Task 2:</strong> SW1 priority set to 4096 (Bridge ID 4097) and verified as Root Bridge.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="task3" onchange="updateProgress()">
+                <label for="task3"><strong>Task 3:</strong> Confirmed default parallel link behavior: SW2 Gi0/1 is Root Port and SW2 Gi0/2 is Alternate/Blocking.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="task4" onchange="updateProgress()">
+                <label for="task4"><strong>Task 4:</strong> Configured <code>spanning-tree port-priority 64</code> on SW1 interface GigabitEthernet0/2.</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="task5" onchange="updateProgress()">
+                <label for="task5"><strong>Task 5:</strong> Verified on SW2 that Gi0/2 is now the active Root Port (FWD) and Gi0/1 is Alternate (BLK).</label>
+            </li>
+            <li class="checklist-item">
+                <input type="checkbox" id="task6" onchange="updateProgress()">
+                <label for="task6"><strong>Task 6:</strong> Configured tuned timers on SW1 (Hello 2, Forward Delay 10, Max Age 14) and verified propagation to SW2.</label>
+            </li>
+        </ul>
+
+        <div style="margin-top: 20px;">
+            <div class="verif-step">
+                <div class="verif-title">🧪 Expected Output: SW2 Port Priority Tiebreaker Verification</div>
+                <div class="code-block">
+                    <pre><code>SW2# show spanning-tree vlan 1
+
+VLAN0001
+  Spanning tree enabled protocol ieee
+  Root ID    Priority    4097
+             Address     5254.0012.3456
+             Cost        4
+             Port        3 (GigabitEthernet0/2)
+             Hello Time   2 sec  Max Age 14 sec  Forward Delay 10 sec
+
+  Bridge ID  Priority    32769  (priority 32768 sys-id-ext 1)
+             Address     5254.0099.8877
+             Hello Time   2 sec  Max Age 14 sec  Forward Delay 10 sec
+             Aging Time  300 sec
+
+Interface           Role Sts Cost      Prio.Nbr Type
+------------------- ---- --- --------- -------- --------------------------------
+Gi0/1               Altn BLK 4         128.2    P2p 
+Gi0/2               Root FWD 4         128.3    P2p 
+Gi0/3               Desg FWD 4         128.4    P2p </code></pre>
+                </div>
+            </div>
+
+            <div class="verif-step">
+                <div class="verif-title">🧪 Expected Output: SW2 <code>show spanning-tree detail</code> on Gi0/2</div>
+                <div class="code-block">
+                    <pre><code>SW2# show spanning-tree interface GigabitEthernet0/2 detail
+
+ Port 3 (GigabitEthernet0/2) of VLAN0001 is Root Forwarding 
+   Port path cost 4, Designated root has priority 4097, address 5254.0012.3456
+   Designated bridge has priority 4097, address 5254.0012.3456
+   Designated port id is 64.3, designated path cost 0
+   Timers: message age 0, forward delay 0, hold 0
+   Number of transitions to forwarding state: 1
+   Link type is point-to-point by default
+   BPDU: sent 0, received 142</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. COMPLETED CONFIGURATIONS & DEEP-DIVE (SPOILER DRAWER) -->
+    <details class="card solution-drawer">
+        <summary>
+            <span>✅ Completed Configurations & Engineering Deep-Dive & Exam Pitfalls</span>
+            <span class="solution-badge">Click to Reveal Solutions</span>
+        </summary>
+        <div class="solution-content" style="margin-top: 18px;">
+            <p style="color: var(--text-muted); font-size: 0.9rem;">
+                Review the completed Cisco IOS switch syntax, copy configs to your clipboard, and study the comprehensive engineering analysis.
+            </p>
+
+            <!-- Tab Controls -->
+            <div class="tabs-header">
+                <button class="tab-btn active" onclick="showTab('tab-sw1', this)">Switch 1 (SW1)</button>
+                <button class="tab-btn" onclick="showTab('tab-sw2', this)">Switch 2 (SW2)</button>
+                <button class="tab-btn" onclick="showTab('tab-hosts', this)">Host Endpoints</button>
+                <button class="tab-btn" onclick="showTab('tab-deepdive', this)">🎓 Engineering Deep-Dive & Key Topics</button>
+            </div>
+
+            <!-- Tab 1: SW1 -->
+            <div class="tab-pane active" id="tab-sw1">
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy SW1 Config</button>
+                    <pre><code>enable
+configure terminal
+!
+hostname SW1
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+!
+! 1. Make SW1 the Primary Root Bridge
+spanning-tree vlan 1 priority 4096
+!
+! 2. Tune Spanning Tree Timers on the Root Bridge
+spanning-tree vlan 1 hello-time 2
+spanning-tree vlan 1 forward-time 10
+spanning-tree vlan 1 max-age 14
+!
+interface GigabitEthernet0/1
+ description Trunk to SW2 Gi0/1 (Default Prio 128)
+ switchport mode trunk
+ switchport trunk encapsulation dot1q
+ no shutdown
+!
+interface GigabitEthernet0/2
+ description Trunk to SW2 Gi0/2 (Preferred Prio 64)
+ switchport mode trunk
+ switchport trunk encapsulation dot1q
+ spanning-tree port-priority 64
+ no shutdown
+!
+interface GigabitEthernet0/3
+ description Access Port to PC-A
+ switchport mode access
+ switchport access vlan 1
+ no shutdown
+!
+end
+write memory</code></pre>
+                </div>
+            </div>
+
+            <!-- Tab 2: SW2 -->
+            <div class="tab-pane" id="tab-sw2">
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy SW2 Config</button>
+                    <pre><code>enable
+configure terminal
+!
+hostname SW2
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+!
+! SW2 remains at default priority 32768
+!
+interface GigabitEthernet0/1
+ description Trunk to SW1 Gi0/1 (Becomes Alternate BLK)
+ switchport mode trunk
+ switchport trunk encapsulation dot1q
+ no shutdown
+!
+interface GigabitEthernet0/2
+ description Trunk to SW1 Gi0/2 (Becomes Root Port FWD via SW1 Prio 64)
+ switchport mode trunk
+ switchport trunk encapsulation dot1q
+ no shutdown
+!
+interface GigabitEthernet0/3
+ description Access Port to PC-B
+ switchport mode access
+ switchport access vlan 1
+ no shutdown
+!
+end
+write memory</code></pre>
+                </div>
+            </div>
+
+            <!-- Tab 3: Host Commands -->
+            <div class="tab-pane" id="tab-hosts">
+                <p style="font-size: 0.85rem; color: var(--text-muted);">Alpine Linux CLI Commands & Connectivity Test:</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy Host Commands</button>
+                    <pre><code># PC-A (Connected to SW1 Gi0/3):
+ip addr add 10.1.1.10/24 dev eth0
+ip link set eth0 up
+ping -c 4 10.1.1.20
+
+# PC-B (Connected to SW2 Gi0/3):
+ip addr add 10.1.1.20/24 dev eth0
+ip link set eth0 up
+ping -c 4 10.1.1.10</code></pre>
+                </div>
+            </div>
+
+            <!-- Tab 4: Engineering Deep-Dive & Exam Pitfalls -->
+            <div class="tab-pane" id="tab-deepdive">
+                <div class="commentary-section">
+                    <h4>🔬 Deep-Dive: The Mechanics of STP Port Priority & Port ID</h4>
+                    <p>
+                        When a non-root switch connects to an upstream switch via multiple parallel links, the root path cost through all parallel links is identical. In Cisco IOS, the switch uses the <strong>Port ID</strong> advertised by the upstream neighbor in its BPDUs to break the tie.
+                    </p>
+                </div>
+
+                <div class="commentary-section">
+                    <h4>1. Structure of the 16-Bit Port ID</h4>
+                    <p>
+                        Every switch interface has a 16-bit Port ID formatted as <code>[Port Priority].[Internal Port Number]</code>:
+                    </p>
+                    <ul>
+                        <li><strong>Port Priority (8 bits)</strong>: Configurable in increments of <strong>16</strong> (0, 16, 32, 48, 64, 80, 96, 112, 128, ..., 240). Default value is <strong>128</strong>.</li>
+                        <li><strong>Internal Port Number (8 bits)</strong>: Assigned sequentially by Cisco IOS based on the internal slot/port number (e.g. Gi0/0 = Port 1, Gi0/1 = Port 2, Gi0/2 = Port 3, etc.).</li>
+                    </ul>
+                    <div class="callout">
+                        <strong>Why did SW2 block Gi0/2 originally?</strong>
+                        <br>SW1 sent BPDUs out Gi0/1 with Port ID <code>128.2</code>.
+                        <br>SW1 sent BPDUs out Gi0/2 with Port ID <code>128.3</code>.
+                        <br>Because <code>128.2 &lt; 128.3</code>, SW2 selected Gi0/1 as Root Port and placed Gi0/2 into Alternate/Blocking!
+                    </div>
+                </div>
+
+                <div class="commentary-section">
+                    <h4>2. How Port Priority Tuning Works</h4>
+                    <p>
+                        When you configure <code>spanning-tree port-priority 64</code> on <strong>SW1 Gi0/2</strong>:
+                    </p>
+                    <ul>
+                        <li>SW1 begins sending BPDUs out Gi0/2 advertising Designated Port ID <code>64.3</code>.</li>
+                        <li>SW2 compares <code>128.2</code> (received on Gi0/1) vs <code>64.3</code> (received on Gi0/2).</li>
+                        <li>Because <code>64.3 &lt; 128.2</code>, SW2 immediately elects <strong>Gi0/2</strong> as its Root Port and blocks Gi0/1.</li>
+                        <li><em>Crucial Exam Takeaway:</em> Port priority is evaluated on the <strong>sending (upstream) switch</strong>, not the receiving switch!</li>
+                    </ul>
+                </div>
+
+                <div class="commentary-section">
+                    <h4>3. STP Timers & Propagation Rules</h4>
+                    <p>
+                        In classic STP (802.1D) and PVST+:
+                    </p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Timer</th>
+                                <th>Default Value</th>
+                                <th>Function</th>
+                                <th>Where Configured?</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Hello Time</strong></td>
+                                <td>2 Seconds</td>
+                                <td>Interval between successive Hello BPDU transmissions generated by the Root Bridge.</td>
+                                <td><strong>Root Bridge Only</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Max Age</strong></td>
+                                <td>20 Seconds (10 x Hello)</td>
+                                <td>Time a switch waits before declaring a stored BPDU invalid after missing hellos.</td>
+                                <td><strong>Root Bridge Only</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Forward Delay</strong></td>
+                                <td>15 Seconds</td>
+                                <td>Time spent in the <em>Listening</em> state and <em>Learning</em> state before entering Forwarding.</td>
+                                <td><strong>Root Bridge Only</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="callout callout-amber">
+                        <strong>Mathematical Timer Rules (IEEE 802.1D):</strong>
+                        <br>Cisco IOS enforces these strict formulas when tuning STP timers:
+                        <br>1. <code>2 &times; (Forward Delay - 1) &ge; Max Age</code> (e.g., 2 &times; (10 - 1) = 18 &ge; 14 &check;)
+                        <br>2. <code>Max Age &ge; 2 &times; (Hello Time + 1)</code> (e.g., 14 &ge; 2 &times; (2 + 1) = 6 &check;)
+                    </div>
+                </div>
+
+                <div class="commentary-section">
+                    <h4>4. Comparison: Classic STP (802.1D) vs Rapid STP (802.1w)</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>IEEE 802.1D (Classic STP / PVST+)</th>
+                                <th>IEEE 802.1w (Rapid STP / Rapid-PVST+)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Convergence Speed</strong></td>
+                                <td>30 to 50 seconds (timer-based)</td>
+                                <td><strong>Sub-second (1–2 seconds)</strong> via handshake</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Port Roles</strong></td>
+                                <td>Root, Designated, Blocking, Disabled</td>
+                                <td><strong>Root, Designated, Alternate, Backup, Disabled</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Port States</strong></td>
+                                <td>Disabled, Blocking, Listening, Learning, Forwarding</td>
+                                <td><strong>Discarding, Learning, Forwarding</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>BPDU Generation</strong></td>
+                                <td>Only generated by Root; relayed by others</td>
+                                <td><strong>Every switch generates BPDUs independently</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Fast Transition Mechanisms</strong></td>
+                                <td>None (relies on timers)</td>
+                                <td><strong>Proposal / Agreement Handshake & Edge Ports</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="commentary-section">
+                    <h4>5. Common CCNA Exam Traps & Pitfalls</h4>
+                    <ul>
+                        <li><strong>Trap 1 (Configuring Port Priority on the Wrong Switch):</strong> Configuring <code>spanning-tree port-priority</code> on SW2 changes the port ID that SW2 sends to its neighbors, which does NOT affect SW2's own Root Port selection. Always configure port priority on the upstream switch!</li>
+                        <li><strong>Trap 2 (Port Priority Increments):</strong> Cisco IOS only accepts port priority in multiples of <strong>16</strong>. Entering <code>spanning-tree port-priority 50</code> will be rejected by the CLI.</li>
+                        <li><strong>Trap 3 (Timer Mismatch):</strong> Tuning timers on a non-root switch has no effect because non-root switches overwrite their timers with the values in the Root Bridge's BPDUs. Always tune timers on the <strong>Root Bridge</strong>!</li>
+                        <li><strong>Trap 4 (Root Port Count):</strong> A non-root switch can have <strong>only ONE Root Port</strong> per VLAN, but a single switch can have multiple Designated Ports.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </details>
+
+</div>
+
+<script>
+    // 1-Click Copy Function
+    function copyCode(btn) {
+        const pre = btn.nextElementSibling;
+        navigator.clipboard.writeText(pre.innerText).then(() => {
+            const originalText = btn.innerText;
+            btn.innerText = "Copied!";
+            btn.style.background = "#10b981";
+            btn.style.borderColor = "#10b981";
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.style.background = "#223049";
+                btn.style.borderColor = "#334155";
+            }, 2000);
+        });
+    }
+
+    // Solution Tabs Switcher
+    function showTab(tabId, btn) {
+        document.querySelectorAll(".tab-pane").forEach(pane => pane.classList.remove("active"));
+        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+        document.getElementById(tabId).classList.add("active");
+        btn.classList.add("active");
+    }
+
+    // Interactive Checklist Progress Tracker
+    function updateProgress() {
+        const total = document.querySelectorAll(".checklist-item input[type='checkbox']").length;
+        const checked = document.querySelectorAll(".checklist-item input[type='checkbox']:checked").length;
+        const percent = Math.round((checked / total) * 100);
+
+        document.getElementById("progress-bar").style.width = percent + "%";
+        document.getElementById("progress-text").innerText = `${checked} of ${total} Tasks Completed (${percent}%)`;
+    }
+</script>
+
+</body>
+</html>

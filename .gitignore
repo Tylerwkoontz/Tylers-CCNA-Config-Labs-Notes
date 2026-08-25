@@ -28,3 +28,8 @@ Thumbs.db
 # Environment variables & local secrets
 .env
 *.local
+
+# CML Breakout Tool binaries & state
+breakout-tool/breakout-*
+breakout-tool/labs.yaml
+breakout-tool/config.yaml

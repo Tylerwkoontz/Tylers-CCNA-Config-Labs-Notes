@@ -39,6 +39,16 @@
     "cml_id": "0fd294a1-3799-4580-899e-95821c17b581",
     "file": "lab07b-interface-diagnostics-duplex.yaml"
   },
+  "lab09": {
+    "title": "CCNA Lab 09: Classic STP Root Election & Path Cost",
+    "cml_id": "e0c2a0eb-0f9b-4fc3-a216-2c74a5d1e316",
+    "file": "lab09-stp-root-election-path-cost.yaml"
+  },
+  "lab09b": {
+    "title": "CCNA Lab 09B: STP Parallel Links & Timer Tuning",
+    "cml_id": "bb392597-4777-4c38-9952-fefcfebf6a86",
+    "file": "lab09b-stp-port-priority-timers.yaml"
+  },
   "lab17": {
     "title": "CCNA Lab 17: Multi-Subnet IPv4 Routing",
     "cml_id": "e7e2a09f-3364-4c45-a401-acf83cdd610e",

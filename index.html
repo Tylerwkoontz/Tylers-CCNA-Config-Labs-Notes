@@ -423,17 +423,17 @@
             <div class="hero-badges">
                 <span class="hero-badge badge-cyan">CCNA 200-301 v1.1</span>
                 <span class="hero-badge badge-green">Exam Performance Labs</span>
-                <span class="hero-badge badge-purple">9 CML Topologies Live</span>
+                <span class="hero-badge badge-purple">11 CML Topologies Live</span>
             </div>
             <h1>Tyler's CCNA Lab Hub & Command Center</h1>
-            <p>Direct access to 9 interactive CertSkills workbooks, mental speed drills, and CML automation.</p>
+            <p>Direct access to 11 interactive CertSkills workbooks, mental speed drills, and CML automation.</p>
         </div>
         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-            <a href="labs/lab06-switch-management-ssh.html" class="btn btn-primary">
-                🚀 Active Lab 06 (SSH)
+            <a href="labs/lab09-stp-root-election-path-cost.html" class="btn btn-primary">
+                👑 Active Lab 09 (STP Root)
             </a>
-            <a href="labs/lab07-switch-interfaces-mac-table.html" class="btn btn-secondary">
-                ⚡ Active Lab 07 (MAC Table)
+            <a href="labs/lab09b-stp-port-priority-timers.html" class="btn btn-secondary">
+                ⚡ Active Lab 09B (STP Timers)
             </a>
         </div>
     </div>
@@ -443,15 +443,15 @@
         <div class="stat-card">
             <div class="stat-icon">🧪</div>
             <div>
-                <div class="stat-val">9 Labs Ready</div>
+                <div class="stat-val">11 Labs Ready</div>
                 <div class="stat-label">Workbooks Available</div>
             </div>
         </div>
         <div class="stat-card">
             <div class="stat-icon">📖</div>
             <div>
-                <div class="stat-val">Part II Active</div>
-                <div class="stat-label">Chapters 4–7 Focus</div>
+                <div class="stat-val">Part II & III</div>
+                <div class="stat-label">Ethernet LANs & STP</div>
             </div>
         </div>
         <div class="stat-card">
@@ -472,28 +472,28 @@
 
     <!-- 3. ACTIVE FOCUS HIGHLIGHT -->
     <h2>🎯 Active Chapter Focus</h2>
-    <div class="card" style="border-left: 5px solid #10b981; background: linear-gradient(to right, #13232c, #151e2e);">
+    <div class="card" style="border-left: 5px solid #38bdf8; background: linear-gradient(to right, #13232c, #151e2e);">
         <div class="card-header">
             <div>
-                <h3 class="card-title" style="font-size: 1.25rem;">Volume 1, Part II: Implementing Ethernet LANs (Chapters 4–7)</h3>
+                <h3 class="card-title" style="font-size: 1.25rem;">Volume 1, Part III: Implementing VLANs and STP (Chapters 8–10)</h3>
                 <p class="card-desc" style="margin-top: 4px;">
-                    Mastering Cisco Catalyst switch management, SVI VLAN 1 addressing, default gateway, hardened SSH v2, speed/duplex autonegotiation, and MAC address table forwarding logic.
+                    Mastering IEEE 802.1D / 802.1w Spanning Tree Protocol, Bridge ID hierarchy, Root Bridge elections, Root/Designated/Alternate port selection, port cost tuning, port priority tiebreakers, and convergence timers.
                 </p>
             </div>
             <span class="tag tag-active">In Progress</span>
         </div>
         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-            <a href="labs/lab06-switch-management-ssh.html" class="btn btn-primary">
-                📄 Lab 06 (SSH & SVI)
+            <a href="labs/lab09-stp-root-election-path-cost.html" class="btn btn-primary">
+                👑 Lab 09 (STP Root & Path Cost)
             </a>
-            <a href="labs/lab06b-cross-subnet-management.html" class="btn btn-green">
-                📄 Lab 06B (Default Gateway)
+            <a href="labs/lab09b-stp-port-priority-timers.html" class="btn btn-green">
+                ⚡ Lab 09B (STP Port Priority & Timers)
             </a>
             <a href="labs/lab07-switch-interfaces-mac-table.html" class="btn btn-secondary">
                 📄 Lab 07 (MAC Table)
             </a>
-            <a href="labs/lab07b-interface-diagnostics-duplex.html" class="btn btn-secondary">
-                📄 Lab 07B (Duplex Diagnostics)
+            <a href="labs/lab06-switch-management-ssh.html" class="btn btn-secondary">
+                📄 Lab 06 (SSH & SVI)
             </a>
         </div>
     </div>
@@ -503,9 +503,10 @@
     
     <!-- Filter Chips -->
     <div class="filter-group">
-        <button class="filter-chip active" onclick="filterLabs('all', this)">All Labs (9)</button>
+        <button class="filter-chip active" onclick="filterLabs('all', this)">All Labs (11)</button>
         <button class="filter-chip" onclick="filterLabs('part1', this)">Part I: Networking Intro (3)</button>
         <button class="filter-chip" onclick="filterLabs('part2', this)">Part II: Ethernet LANs (5)</button>
+        <button class="filter-chip" onclick="filterLabs('part3', this)">Part III: VLANs & STP (2)</button>
         <button class="filter-chip" onclick="filterLabs('part5', this)">Part V: IPv4 Routing (1)</button>
     </div>
 
@@ -697,6 +698,56 @@
         </div>
     </div>
 
+    <!-- PART III SECTION -->
+    <div class="lab-section" id="section-part3">
+        <div class="part-section-title">📁 Part III: Implementing VLANs & Spanning Tree (Chapters 8–10)</div>
+        <div class="grid-2">
+            <!-- Lab 09 Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h3 class="card-title">Lab 09: Classic STP Root Election & Path Cost</h3>
+                        <p style="font-size: 0.8rem; color: #38bdf8; margin: 2px 0;">CCNA 2.5 • Part III (Ch 9)</p>
+                    </div>
+                    <span class="tag tag-cml">CML: e0c2a0eb</span>
+                </div>
+                <p class="card-desc">
+                    Master IEEE 802.1D Spanning Tree Bridge ID election, configure deterministic primary/secondary root priorities (4096/8192), trace Root Path Costs, and manipulate port costs to force path failover.
+                </p>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <a href="labs/lab09-stp-root-election-path-cost.html" class="btn btn-primary">
+                        Open Workbook
+                    </a>
+                    <button class="btn btn-cml" onclick="copyCmlCommand('e0c2a0eb-0f9b-4fc3-a216-2c74a5d1e316', this)">
+                        ⚡ Copy CML Start
+                    </button>
+                </div>
+            </div>
+
+            <!-- Lab 09B Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h3 class="card-title">Lab 09B: STP Parallel Links & Timer Tuning</h3>
+                        <p style="font-size: 0.8rem; color: #38bdf8; margin: 2px 0;">CCNA 2.5 • Part III (Ch 9)</p>
+                    </div>
+                    <span class="tag tag-cml">CML: bb392597</span>
+                </div>
+                <p class="card-desc">
+                    Analyze parallel link tiebreakers, manipulate Sender Port Priority (Port ID 64 vs 128) to invert active forwarding trunks, and tune 802.1D convergence timers (Hello, Max Age, Forward Delay).
+                </p>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <a href="labs/lab09b-stp-port-priority-timers.html" class="btn btn-primary">
+                        Open Workbook
+                    </a>
+                    <button class="btn btn-cml" onclick="copyCmlCommand('bb392597-4777-4c38-9952-fefcfebf6a86', this)">
+                        ⚡ Copy CML Start
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- PART V SECTION -->
     <div class="lab-section" id="section-part5">
         <div class="part-section-title">📁 Part V: IPv4 Routing (Chapters 15–19)</div>
@@ -803,6 +854,53 @@
         </details>
 
         <details>
+            <summary>👑 Part III Quick Ref: STP Algorithm, Bridge ID & Port Cost Rules</summary>
+            <div class="drawer-content" style="font-size: 0.88rem;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px;">
+                    <div>
+                        <h4 style="color: var(--accent-amber); margin: 0 0 6px 0;">3-Step STP Election Process:</h4>
+                        <ol style="margin: 0; padding-left: 18px; line-height: 1.6;">
+                            <li><strong>1 Root Bridge per VLAN</strong>: Lowest Bridge ID (Priority + System ID Extension + Base MAC).</li>
+                            <li><strong>1 Root Port (RP) per Non-Root Switch</strong>: Lowest cumulative Root Path Cost to Root.</li>
+                            <li><strong>1 Designated Port (DP) per Segment</strong>: Lowest Root Path Cost onto segment. Remaining ports become <strong>Alternate/Blocking (AP)</strong>.</li>
+                        </ol>
+                        <h4 style="color: var(--accent-cyan); margin: 12px 0 6px 0;">4-Step Port Role Tiebreakers:</h4>
+                        <ol style="margin: 0; padding-left: 18px; line-height: 1.6;">
+                            <li>Lowest Root Path Cost</li>
+                            <li>Lowest Sender Bridge ID</li>
+                            <li>Lowest Sender Port Priority (multiples of 16, default 128)</li>
+                            <li>Lowest Sender Internal Port Number (e.g. Gi0/1 beats Gi0/2)</li>
+                        </ol>
+                    </div>
+                    <div>
+                        <h4 style="color: var(--accent-green); margin: 0 0 6px 0;">Classic STP vs RSTP Matrix:</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Protocol</th>
+                                    <th>Port States</th>
+                                    <th>Convergence</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>802.1D (STP)</strong></td>
+                                    <td>Blocking, Listening (15s), Learning (15s), Forwarding</td>
+                                    <td>30–50s (Timers)</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>802.1w (RSTP)</strong></td>
+                                    <td>Discarding, Learning, Forwarding</td>
+                                    <td>Sub-second (Handshake)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </details>
+
+        <details>
             <summary>🔢 Subnetting Quick Ref: Magic Number & Subnet Mask Chart</summary>
             <div class="drawer-content" style="font-size: 0.88rem;">
                 <p><strong>Magic Number Formula:</strong> <code>Magic Number = 256 - Mask Octet Value</code> (Identifies the subnet step size in the interesting octet).</p>
@@ -892,17 +990,21 @@
     </div>
 
     <!-- 8. CML CONTROLLER AUTOMATION REFERENCE -->
-    <h2>⚡ CML Automation Commands</h2>
+    <h2>⚡ CML Automation & Terminal Commands</h2>
     <div class="card">
-        <p class="card-desc">Execute these commands from your terminal to manage topologies on <code>cml-controller.internal</code>:</p>
-        <pre><code># 1. List all active labs on Proxmox
-python3 ~/ccna-study/scripts/cml_client.py list
+        <p class="card-desc">Quick reference shortcuts configured in your shell (<code>~/.zshrc</code>) for seamless labbing:</p>
+        <pre><code># --- Daily Study Aliases ---
+cml-labs       # List all labs on cml-controller.internal
+cml-breakout   # Start Breakout proxy (binds local TCP ports 9000+)
+cml-con        # Interactive console selector (connect to SW1, SW2, etc.)
+cml-ui         # Open Breakout Web UI on http://127.0.0.1:8080 (Wireshark live capture)
 
-# 2. Start a specific lab topology (e.g. Lab 06)
-python3 ~/ccna-study/scripts/cml_client.py start 98a5a03b-fe9e-4f57-bbed-f1f88894cab8
+# --- Direct Lab Management ---
+python3 ~/ccna-study/scripts/cml_client.py start &lt;lab-uuid&gt;
+python3 ~/ccna-study/scripts/cml_client.py stop &lt;lab-uuid&gt;
 
-# 3. Stop / Wipe a lab topology
-python3 ~/ccna-study/scripts/cml_client.py stop &lt;lab-uuid&gt;</code></pre>
+# --- Exit Console Tip ---
+# In telnet session: Press 'Ctrl + ]', then type 'quit' and press Enter.</code></pre>
     </div>
 
 </div>
@@ -931,24 +1033,34 @@ python3 ~/ccna-study/scripts/cml_client.py stop &lt;lab-uuid&gt;</code></pre>
 
         const secPart1 = document.getElementById('section-part1');
         const secPart2 = document.getElementById('section-part2');
+        const secPart3 = document.getElementById('section-part3');
         const secPart5 = document.getElementById('section-part5');
 
         if (category === 'all') {
-            secPart1.style.display = 'block';
-            secPart2.style.display = 'block';
-            secPart5.style.display = 'block';
+            if (secPart1) secPart1.style.display = 'block';
+            if (secPart2) secPart2.style.display = 'block';
+            if (secPart3) secPart3.style.display = 'block';
+            if (secPart5) secPart5.style.display = 'block';
         } else if (category === 'part1') {
-            secPart1.style.display = 'block';
-            secPart2.style.display = 'none';
-            secPart5.style.display = 'none';
+            if (secPart1) secPart1.style.display = 'block';
+            if (secPart2) secPart2.style.display = 'none';
+            if (secPart3) secPart3.style.display = 'none';
+            if (secPart5) secPart5.style.display = 'none';
         } else if (category === 'part2') {
-            secPart1.style.display = 'none';
-            secPart2.style.display = 'block';
-            secPart5.style.display = 'none';
+            if (secPart1) secPart1.style.display = 'none';
+            if (secPart2) secPart2.style.display = 'block';
+            if (secPart3) secPart3.style.display = 'none';
+            if (secPart5) secPart5.style.display = 'none';
+        } else if (category === 'part3') {
+            if (secPart1) secPart1.style.display = 'none';
+            if (secPart2) secPart2.style.display = 'none';
+            if (secPart3) secPart3.style.display = 'block';
+            if (secPart5) secPart5.style.display = 'none';
         } else if (category === 'part5') {
-            secPart1.style.display = 'none';
-            secPart2.style.display = 'none';
-            secPart5.style.display = 'block';
+            if (secPart1) secPart1.style.display = 'none';
+            if (secPart2) secPart2.style.display = 'none';
+            if (secPart3) secPart3.style.display = 'none';
+            if (secPart5) secPart5.style.display = 'block';
         }
     }
 
